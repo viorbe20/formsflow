@@ -1,8 +1,3 @@
-Perfecto. Este es el README genérico de Laravel, así que **lo sustituiría por el README de FormsFlow**. Pero ahora mismo no debemos afirmar que ya existen API, ETL, NLP, automatizaciones, etc.; las vamos a construir.
-
-Te propongo dejarlo así **en el estado actual del Día 1**:
-
-````md
 # FormsFlow
 
 **Plataforma demostradora de formularios digitales, integración de datos y automatización de procesos.**
@@ -31,7 +26,7 @@ El proyecto está planteado como un demostrador técnico de desarrollo de soluci
 
 ## 🎯 Objetivo
 
-Construir una aplicación web completa que permita demostrar, mediante un caso práctico, competencias en:
+**Construir una aplicación web completa que simule el ciclo de gestión de una solicitud administrativa digital**, desde su presentación mediante formulario hasta su almacenamiento, procesamiento, clasificación y explotación del dato.
 
 * Desarrollo de aplicaciones web con Laravel.
 * Diseño y gestión de bases de datos relacionales.
@@ -48,6 +43,82 @@ Construir una aplicación web completa que permita demostrar, mediante un caso p
 
 La inteligencia artificial/PLN será un **componente auxiliar del sistema**, no el objetivo principal de la aplicación.
 
+---
+## 📋 Caso de uso
+
+FormsFlow simula una plataforma de gestión de solicitudes dirigidas a un organismo público.
+
+El ciudadano puede presentar una solicitud mediante un formulario digital, indicando sus datos de contacto, el organismo destinatario, el asunto, una descripción de la situación (`Expone`) y la actuación que solicita (`Solicita`).
+
+La aplicación registra y gestiona estas solicitudes y, posteriormente, permite procesar los datos mediante procesos ETL y aplicar un componente de PLN para clasificar automáticamente las solicitudes y establecer una prioridad orientativa.
+
+El proyecto utiliza un **caso de uso ficticio**, inspirado en los patrones habituales de los formularios administrativos electrónicos, sin utilizar datos personales ni tramitar solicitudes reales.
+
+### Flujo funcional
+
+```text
+Formulario ciudadano
+        ↓
+Registro de solicitud
+        ↓
+Validación
+        ↓
+PostgreSQL
+        ↓
+ETL
+        ↓
+Clasificación NLP
+        ↓
+Prioridad y categoría
+        ↓
+Explotación del dato
+        ↓
+Automatización
+```
+---
+### Modelo de datos
+
+La entidad principal del sistema es `Solicitud`, que representa una solicitud administrativa presentada mediante el formulario digital.
+
+La solicitud contiene:
+
+- Datos del solicitante.
+- Organismo y unidad destinataria.
+- Asunto.
+- Exposición (`Expone`).
+- Petición (`Solicita`).
+- Estado de tramitación.
+- Categoría y prioridad.
+
+La categoría y la prioridad se incorporarán posteriormente mediante el procesamiento automático del sistema.
+
+```text
+Formulario
+    ↓
+Solicitud
+    ↓
+PostgreSQL
+    ↓
+ETL / NLP
+    ↓
+Categoría + prioridad
+
+**Datos principales de una solicitud**
+Solicitud
+├── Datos del solicitante
+├── Destino
+├── Asunto
+├── Expone
+├── Solicita
+├── Estado
+├── Categoría
+└── Prioridad
+
+**Tipos de solicitudes**
+
+Información → consultas sobre servicios o procedimientos.
+Incidencia → comunicación de un problema en un servicio.
+Documentación → solicitudes relacionadas con documentos o certificados.
 ---
 
 ## 🏗️ Arquitectura
