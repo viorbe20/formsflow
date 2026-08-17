@@ -1,59 +1,244 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+Perfecto. Este es el README genérico de Laravel, así que **lo sustituiría por el README de FormsFlow**. Pero ahora mismo no debemos afirmar que ya existen API, ETL, NLP, automatizaciones, etc.; las vamos a construir.
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Te propongo dejarlo así **en el estado actual del Día 1**:
 
-## About Laravel
+````md
+# FormsFlow
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**Plataforma demostradora de formularios digitales, integración de datos y automatización de procesos.**
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+FormsFlow es un proyecto full-stack desarrollado con Laravel que reproduce, a pequeña escala, un flujo de trabajo de gestión digital de solicitudes:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```text
+Formulario
+    ↓
+API REST
+    ↓
+Base de datos
+    ↓
+ETL
+    ↓
+Explotación del dato
+    ↓
+Automatización
+    ↓
+Clasificación NLP
+````
 
-## Learning Laravel
+El proyecto está planteado como un demostrador técnico de desarrollo de soluciones digitales, integración, gestión de datos, automatización y aplicación de técnicas de PLN.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 🎯 Objetivo
 
-## Laravel Sponsors
+Construir una aplicación web completa que permita demostrar, mediante un caso práctico, competencias en:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+* Desarrollo de aplicaciones web con Laravel.
+* Diseño y gestión de bases de datos relacionales.
+* Desarrollo y consumo de APIs REST.
+* Diseño de formularios digitales y validación de datos.
+* Procesos ETL.
+* Automatización de tareas.
+* Explotación y visualización de datos.
+* Aplicación de técnicas de PLN para clasificación.
+* Testing.
+* Contenerización con Docker.
+* Integración continua.
+* Documentación técnica.
 
-### Premium Partners
+La inteligencia artificial/PLN será un **componente auxiliar del sistema**, no el objetivo principal de la aplicación.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## 🏗️ Arquitectura
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+La aplicación se desarrollará sobre una arquitectura basada en contenedores:
 
-## Code of Conduct
+```text
+┌───────────────────────────────┐
+│          FormsFlow            │
+│                               │
+│  ┌─────────────────────────┐  │
+│  │       Laravel 12        │  │
+│  │       PHP 8.3           │  │
+│  └────────────┬────────────┘  │
+│               │               │
+│               ▼               │
+│  ┌─────────────────────────┐  │
+│  │      PostgreSQL 16      │  │
+│  └─────────────────────────┘  │
+│                               │
+└───────────────────────────────┘
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+El componente de PLN se incorporará posteriormente como un servicio independiente.
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 🛠️ Stack tecnológico
 
-## License
+| Tecnología     | Uso                         |
+| -------------- | --------------------------- |
+| Laravel 12     | Backend y aplicación web    |
+| PHP 8.3        | Lenguaje de backend         |
+| PostgreSQL 16  | Base de datos               |
+| Docker         | Contenerización             |
+| Docker Compose | Orquestación local          |
+| Composer       | Gestión de dependencias PHP |
+| PHPUnit        | Testing                     |
+| Git / GitHub   | Control de versiones        |
+| GitHub Actions | Integración continua        |
+| Python         | Componente NLP              |
+| FastAPI        | API del servicio NLP        |
+| scikit-learn   | Clasificación de texto      |
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+> Los componentes que todavía no se han implementado se incorporarán progresivamente durante el desarrollo.
+
+---
+
+## 🚀 Estado del proyecto
+
+### Día 1 — Infraestructura
+
+* [x] Docker Desktop configurado.
+* [x] Docker Compose funcionando.
+* [x] PHP 8.3 configurado.
+* [x] Composer configurado.
+* [x] Laravel 12.66.0 instalado.
+* [x] PostgreSQL 16 configurado.
+* [x] Laravel conectado con PostgreSQL.
+* [x] Migraciones iniciales ejecutadas.
+* [x] Aplicación accesible mediante Docker.
+* [x] Repositorio Git inicializado.
+* [x] Primer commit realizado.
+* [x] Repositorio GitHub creado.
+
+### Próximas fases
+
+* [ ] Diseño del modelo de datos.
+* [ ] Formularios digitales.
+* [ ] Gestión de solicitudes.
+* [ ] API REST.
+* [ ] Pipeline ETL.
+* [ ] Dashboard y explotación de datos.
+* [ ] Automatización mediante Jobs y Scheduler.
+* [ ] Servicio NLP.
+* [ ] Testing funcional y de API.
+* [ ] CI/CD.
+* [ ] Documentación de API.
+* [ ] Despliegue de demo pública.
+
+---
+
+## 🐳 Instalación
+
+### Requisitos
+
+* Docker Desktop
+* Git
+
+No es necesario instalar PHP, Composer o PostgreSQL directamente en el equipo, ya que forman parte del entorno Docker.
+
+### Ejecutar el proyecto
+
+Clonar el repositorio:
+
+```bash
+git clone git@github.com:viorbe20/formsflow.git
+cd formsflow
+```
+
+Crear el archivo de configuración:
+
+```bash
+cp .env.example .env
+```
+
+Arrancar los servicios:
+
+```bash
+docker compose up -d
+```
+
+Ejecutar las migraciones:
+
+```bash
+docker compose exec app php artisan migrate
+```
+
+La aplicación estará disponible en:
+
+```text
+http://localhost:8000
+```
+
+---
+
+## 🧪 Testing
+
+El proyecto utilizará PHPUnit para las pruebas automatizadas.
+
+Las pruebas se ejecutarán dentro del contenedor Docker:
+
+```bash
+docker compose exec app php artisan test
+```
+
+La estrategia de testing incluirá progresivamente:
+
+* Tests unitarios.
+* Tests de funcionalidades.
+* Tests de API.
+* Validación de formularios.
+* Tests de procesos de datos.
+
+---
+
+## 📚 Documentación
+
+La documentación del proyecto se encuentra en evolución junto con el desarrollo.
+
+Incluye:
+
+* Arquitectura.
+* Modelo de datos.
+* API REST.
+* Procesos ETL.
+* Automatizaciones.
+* Componente NLP.
+* Decisiones técnicas.
+* Testing.
+* Despliegue.
+
+El seguimiento del desarrollo se mantiene en [`timeline.md`](timeline.md).
+
+---
+
+## 🔗 Enlaces
+
+**Repositorio:**
+[https://github.com/viorbe20/formsflow](https://github.com/viorbe20/formsflow)
+
+**Demo pública:**
+*Pendiente de despliegue.*
+
+---
+
+## 📄 Licencia
+
+Proyecto demostrador desarrollado con fines de portfolio y acreditación de competencias técnicas.
+
+```
+
+### Una decisión importante
+
+**Yo pondría este README ya**, pero no haría todavía un commit de todo el README definitivo. Este será nuestro **README vivo**: cada vez que implementemos una parte real, actualizamos su estado.
+
+Así evitamos el problema típico de los proyectos de portfolio: un README que promete API + ETL + IA + CI/CD, pero al entrar al código todavía no existe.
+
+Ahora mismo podemos decir honestamente:
+
+> **Infraestructura Docker + Laravel 12 + PostgreSQL funcionando.**
+
+Y mañana, cuando construyamos la primera pieza, el README avanzará con ella.
+```
