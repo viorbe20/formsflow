@@ -1,0 +1,38 @@
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: formsflow_app
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "php artisan serve --host=0.0.0.0 --port=8000"
+
+  db:
+    image: postgres:16
+    container_name: formsflow_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: formsflow
+      POSTGRES_USER: formsflow
+      POSTGRES_PASSWORD: formsflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U formsflow -d formsflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
