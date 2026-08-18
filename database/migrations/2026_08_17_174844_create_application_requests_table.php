@@ -3,11 +3,18 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
     public function up(): void
-    {
+    {   // Create a sequence to generate unique application request reference numbers.
+        DB::statement("
+            CREATE SEQUENCE application_request_reference_seq
+            START WITH 1
+            INCREMENT BY 1
+        ");
+        
         Schema::create('application_requests', function (Blueprint $table) {
             $table->id();
 
@@ -32,8 +39,11 @@ return new class extends Migration
         });
     }
 
-    public function down(): void
-    {
-        Schema::dropIfExists('application_requests');
-    }
+public function down(): void
+{
+    Schema::dropIfExists('application_requests');
+
+    // Remove the reference sequence after dropping the dependent table.
+    DB::statement('DROP SEQUENCE IF EXISTS application_request_reference_seq');
+}
 };

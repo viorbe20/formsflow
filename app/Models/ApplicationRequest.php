@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class ApplicationRequest extends Model
 {
@@ -20,4 +21,24 @@ class ApplicationRequest extends Model
         'category',
         'priority',
     ];
+
+    /**
+    * Generate the application request reference code before creation.
+    */
+    protected static function booted(): void
+    {
+        static::creating(function (ApplicationRequest $applicationRequest) {
+            $sequence = DB::selectOne(
+                "SELECT nextval('application_request_reference_seq') AS value"
+            )->value;
+
+            $year = now()->format('Y');
+
+            $applicationRequest->reference_code = sprintf(
+                'FF-%s-%06d',
+                $year,
+                $sequence
+            );
+        });
+    }
 }
