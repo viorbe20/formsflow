@@ -1,0 +1,10 @@
+{
+    "name": "Carlos López",
+    "email": "carlos.lopez@example.com",
+    "phone": "600987654",
+    "organization": "Educación",
+    "unit": "Dirección General de Innovación y Formación del Profesorado",
+    "subject": "Problema con un servicio",
+    "statement": "No puedo acceder correctamente al servicio.",
+    "request_text": "Solicito que se revise el problema."
+}
