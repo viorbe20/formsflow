@@ -246,6 +246,39 @@ http://localhost:8000
 ---
 
 ## 🧪 Testing
+El proyecto utiliza PHPUnit para realizar pruebas automatizadas.
+
+Los tests se ejecutan sobre una base de datos PostgreSQL independiente
+(`formsflow_testing`) para mantener aislados los datos utilizados durante
+las pruebas de la base de datos de desarrollo.
+
+El entorno de testing está configurado en `phpunit.xml` y utiliza el mismo
+motor PostgreSQL que la aplicación. De esta forma, las pruebas también
+cubren las características específicas de PostgreSQL utilizadas por el
+proyecto.
+
+Para ejecutar la batería de tests:
+
+```bash
+docker compose exec app php artisan test
+```
+### Resultado de las pruebas
+
+La configuración de testing utiliza una base de datos PostgreSQL independiente
+de la utilizada durante el desarrollo.
+
+Actualmente, la batería de pruebas se ejecuta correctamente:
+
+- **3 tests**
+- **4 assertions**
+- **0 errores**
+
+Para ejecutar las pruebas:
+
+```bash
+docker compose exec app php artisan test
+```
+
 
 El proyecto utilizará PHPUnit para las pruebas automatizadas.
 

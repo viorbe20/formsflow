@@ -10,7 +10,7 @@ return new class extends Migration
     public function up(): void
     {   // Create a sequence to generate unique application request reference numbers.
         DB::statement("
-            CREATE SEQUENCE application_request_reference_seq
+            CREATE SEQUENCE IF NOT EXISTS application_request_reference_seq
             START WITH 1
             INCREMENT BY 1
         ");

@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ApplicationRequest extends Model
 {
+    use HasFactory;
+    
     protected $fillable = [
         'reference_code',
         'name',
