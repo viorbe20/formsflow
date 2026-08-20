@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\ApplicationRequest;
 use Tests\TestCase;
 
 class ApplicationRequestApiTest extends TestCase
@@ -80,7 +81,7 @@ class ApplicationRequestApiTest extends TestCase
             'reference_code' => $referenceCode,
             'email' => 'test@example.com',
             'status' => 'pending',
-            ]);
+        ]);
     }
 
     /**
@@ -118,7 +119,7 @@ class ApplicationRequestApiTest extends TestCase
     public function test_can_show_application_request(): void
     {
         // Create a test application request in the database.
-        $applicationRequest = \App\Models\ApplicationRequest::factory()->create();
+        $applicationRequest = ApplicationRequest::factory()->create();
 
         // Request the application request using its reference code.
         $response = $this->getJson(

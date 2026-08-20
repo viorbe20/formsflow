@@ -1,32 +1,64 @@
 # FormsFlow
 
-**Plataforma demostradora de formularios digitales, integración de datos y automatización de procesos.**
+**Aplicación web full-stack para la gestión de solicitudes, integración de datos, API REST y automatización de procesos.**
 
 FormsFlow es un proyecto full-stack desarrollado con Laravel que reproduce, a pequeña escala, un flujo de trabajo de gestión digital de solicitudes:
 
-```text
-Formulario
-    ↓
-API REST
-    ↓
-Base de datos
-    ↓
-ETL
-    ↓
-Explotación del dato
-    ↓
-Automatización
-    ↓
-Clasificación NLP
-````
+```mermaid
+flowchart LR
+    A[Formulario] --> B[API REST]
+    B --> C[(Base de datos)]
+    C --> D[ETL]
+    D --> E[Explotación del dato]
+    E --> F[Automatización]
+    F --> G[Clasificación NLP]
+
+    classDef etapa fill:#E8F5E9,stroke:#2E7D32,color:#1B5E20,stroke-width:2px
+    classDef datos fill:#C8E6C9,stroke:#2E7D32,color:#1B5E20,stroke-width:2px
+
+    class A,B,D,E,F,G etapa
+    class C datos
+
+    linkStyle default stroke:#388E3C,stroke-width:2px
+```
 
 El proyecto está planteado como un demostrador técnico de desarrollo de soluciones digitales, integración, gestión de datos, automatización y aplicación de técnicas de PLN.
 
 ---
 
-## 🎯 Objetivo
+## Índice
+
+- [Objetivo](#objetivo)
+- [Caso de uso](#caso-de-uso)
+  - [Flujo funcional](#flujo-funcional)
+- [Modelo de datos](#modelo-de-datos)
+  - [Datos principales de una solicitud](#datos-principales-de-una-solicitud)
+  - [Tipos de solicitudes](#tipos-de-solicitudes)
+- [Arquitectura](#arquitectura)
+- [Stack tecnológico](#stack-tecnológico)
+- [API REST](#api-rest)
+  - [Endpoints](#endpoints)
+  - [Listar solicitudes](#listar-solicitudes)
+  - [Crear una solicitud](#crear-una-solicitud)
+  - [Consultar una solicitud](#consultar-una-solicitud)
+  - [Archivar una solicitud](#archivar-una-solicitud)
+  - [Validación](#validación)
+  - [Códigos HTTP utilizados](#códigos-http-utilizados)
+- [Testing](#testing)
+  - [Resultado actual](#resultado-actual)
+- [Instalación](#instalación)
+  - [Requisitos](#requisitos)
+  - [Ejecutar el proyecto](#ejecutar-el-proyecto)
+- [Documentación](#documentación)
+- [Enlaces](#enlaces)
+- [Licencia](#licencia)
+---
+
+## Objetivo
 
 **Construir una aplicación web completa que simule el ciclo de gestión de una solicitud administrativa digital**, desde su presentación mediante formulario hasta su almacenamiento, procesamiento, clasificación y explotación del dato.
+
+El proyecto permite demostrar progresivamente:
 
 * Desarrollo de aplicaciones web con Laravel.
 * Diseño y gestión de bases de datos relacionales.
@@ -44,67 +76,60 @@ El proyecto está planteado como un demostrador técnico de desarrollo de soluci
 La inteligencia artificial/PLN será un **componente auxiliar del sistema**, no el objetivo principal de la aplicación.
 
 ---
-## 📋 Caso de uso
+
+## Caso de uso
 
 FormsFlow simula una plataforma de gestión de solicitudes dirigidas a un organismo público.
 
 El ciudadano puede presentar una solicitud mediante un formulario digital, indicando sus datos de contacto, el organismo destinatario, el asunto, una descripción de la situación (`Expone`) y la actuación que solicita (`Solicita`).
 
-La aplicación registra y gestiona estas solicitudes y, posteriormente, permite procesar los datos mediante procesos ETL y aplicar un componente de PLN para clasificar automáticamente las solicitudes y establecer una prioridad orientativa.
+La aplicación registra y gestiona estas solicitudes y, posteriormente, permitirá procesar los datos mediante procesos ETL y aplicar un componente de PLN para clasificar automáticamente las solicitudes y establecer una prioridad orientativa.
 
-El proyecto utiliza un **caso de uso ficticio**, inspirado en los patrones habituales de los formularios administrativos electrónicos, sin utilizar datos personales ni tramitar solicitudes reales.
+El proyecto utiliza un **caso de uso ficticio**, inspirado en los patrones habituales de los formularios administrativos electrónicos, sin utilizar datos personales reales ni tramitar solicitudes reales.
 
 ### Flujo funcional
 
-```text
-Formulario ciudadano
-        ↓
-Registro de solicitud
-        ↓
-Validación
-        ↓
-PostgreSQL
-        ↓
-ETL
-        ↓
-Clasificación NLP
-        ↓
-Prioridad y categoría
-        ↓
-Explotación del dato
-        ↓
-Automatización
-```
----
-### Modelo de datos
+```mermaid
+flowchart TD
+    A[Formulario ciudadano] --> B[Registro de solicitud]
+    B --> C[Validación]
+    C[PostgreSQL]
+    C --> E[ETL]
+    E --> F[Clasificación NLP]
+    F --> G[Prioridad y categoría]
+    G --> H[Explotación del dato]
+    H --> I[Automatización]
 
-La entidad principal del sistema es `Solicitud`, que representa una solicitud administrativa presentada mediante el formulario digital.
+    classDef app fill:#e8f5e9,stroke:#388e3c,stroke-width:1px
+    classDef data fill:#e3f2fd,stroke:#1976d2,stroke-width:1px
+    classDef ai fill:#fff3e0,stroke:#f57c00,stroke-width:1px
+
+    class A,B,C app
+    class D,E,H,I data
+    class F,G ai
+```
+
+## Modelo de datos
+
+La entidad principal del sistema es `ApplicationRequest`, que representa una solicitud administrativa presentada mediante el formulario digital.
 
 La solicitud contiene:
 
-- Datos del solicitante.
-- Organismo y unidad destinataria.
-- Asunto.
-- Exposición (`Expone`).
-- Petición (`Solicita`).
-- Estado de tramitación.
-- Categoría y prioridad.
+* Datos del solicitante.
+* Organismo y unidad destinataria.
+* Asunto.
+* Exposición (`Expone`).
+* Petición (`Solicita`).
+* Estado de tramitación.
+* Categoría.
+* Prioridad.
 
 La categoría y la prioridad se incorporarán posteriormente mediante el procesamiento automático del sistema.
 
-```text
-Formulario
-    ↓
-Solicitud
-    ↓
-PostgreSQL
-    ↓
-ETL / NLP
-    ↓
-Categoría + prioridad
+### Datos principales de una solicitud
 
-**Datos principales de una solicitud**
-Solicitud
+```text
+ApplicationRequest
 ├── Datos del solicitante
 ├── Destino
 ├── Asunto
@@ -113,17 +138,21 @@ Solicitud
 ├── Estado
 ├── Categoría
 └── Prioridad
+```
 
-**Tipos de solicitudes**
+### Tipos de solicitudes
 
-Información → consultas sobre servicios o procedimientos.
-Incidencia → comunicación de un problema en un servicio.
-Documentación → solicitudes relacionadas con documentos o certificados.
+El sistema está preparado para trabajar posteriormente con diferentes categorías, como:
+
+* Información → consultas sobre servicios o procedimientos.
+* Incidencia → comunicación de un problema en un servicio.
+* Documentación → solicitudes relacionadas con documentos o certificados.
+
 ---
 
-## 🏗️ Arquitectura
+## Arquitectura
 
-La aplicación se desarrollará sobre una arquitectura basada en contenedores:
+La aplicación se desarrolla sobre una arquitectura basada en contenedores:
 
 ```text
 ┌───────────────────────────────┐
@@ -131,7 +160,7 @@ La aplicación se desarrollará sobre una arquitectura basada en contenedores:
 │                               │
 │  ┌─────────────────────────┐  │
 │  │       Laravel 12        │  │
-│  │       PHP 8.3           │  │
+│  │        PHP 8.3          │  │
 │  └────────────┬────────────┘  │
 │               │               │
 │               ▼               │
@@ -146,7 +175,7 @@ El componente de PLN se incorporará posteriormente como un servicio independien
 
 ---
 
-## 🛠️ Stack tecnológico
+## Stack tecnológico
 
 | Tecnología     | Uso                         |
 | -------------- | --------------------------- |
@@ -167,41 +196,228 @@ El componente de PLN se incorporará posteriormente como un servicio independien
 
 ---
 
-## 🚀 Estado del proyecto
+[ÍNDICE](#índice)
+# API REST
 
-### Día 1 — Infraestructura
+FormsFlow dispone de una API REST para consultar, crear y gestionar solicitudes.
 
-* [x] Docker Desktop configurado.
-* [x] Docker Compose funcionando.
-* [x] PHP 8.3 configurado.
-* [x] Composer configurado.
-* [x] Laravel 12.66.0 instalado.
-* [x] PostgreSQL 16 configurado.
-* [x] Laravel conectado con PostgreSQL.
-* [x] Migraciones iniciales ejecutadas.
-* [x] Aplicación accesible mediante Docker.
-* [x] Repositorio Git inicializado.
-* [x] Primer commit realizado.
-* [x] Repositorio GitHub creado.
+## Endpoints
 
-### Próximas fases
-
-* [ ] Diseño del modelo de datos.
-* [ ] Formularios digitales.
-* [ ] Gestión de solicitudes.
-* [ ] API REST.
-* [ ] Pipeline ETL.
-* [ ] Dashboard y explotación de datos.
-* [ ] Automatización mediante Jobs y Scheduler.
-* [ ] Servicio NLP.
-* [ ] Testing funcional y de API.
-* [ ] CI/CD.
-* [ ] Documentación de API.
-* [ ] Despliegue de demo pública.
+| Método  | Endpoint                                 | Descripción                                                     | Respuesta     |
+| ------- | ---------------------------------------- | --------------------------------------------------------------- | ------------- |
+| `GET`   | `/api/requests`                          | Obtiene un listado resumido de solicitudes                      | `200 OK`      |
+| `POST`  | `/api/requests`                          | Crea una nueva solicitud                                        | `201 Created` |
+| `GET`   | `/api/requests/{reference_code}`         | Obtiene una solicitud completa mediante su código de referencia | `200 OK`      |
+| `PATCH` | `/api/requests/{reference_code}/archive` | Archiva una solicitud                                           | `200 OK`      |
 
 ---
 
-## 🐳 Instalación
+## Listar solicitudes
+
+```http
+GET /api/requests
+Accept: application/json
+```
+
+La respuesta contiene un listado resumido de las solicitudes:
+
+```json
+{
+    "data": [
+        {
+            "reference_code": "FF-2026-000010",
+            "organization": "Educación",
+            "unit": "Dirección General de Innovación y Formación del Profesorado",
+            "subject": "Problema con un servicio",
+            "status": "pending",
+            "category": null,
+            "priority": null,
+            "created_at": "2026-08-20T09:48:27.000000Z"
+        }
+    ]
+}
+```
+
+El listado utiliza una selección reducida de campos y no incluye los datos personales ni el contenido completo de la solicitud.
+
+---
+
+## Crear una solicitud
+
+```http
+POST /api/requests
+Content-Type: application/json
+Accept: application/json
+```
+
+Ejemplo de petición:
+
+```json
+{
+    "name": "Carlos López",
+    "email": "carlos.lopez@example.com",
+    "phone": "600987654",
+    "organization": "Educación",
+    "unit": "Dirección General de Innovación y Formación del Profesorado",
+    "subject": "Problema con un servicio",
+    "statement": "No puedo acceder correctamente al servicio.",
+    "request_text": "Solicito que se revise el problema."
+}
+```
+
+Respuesta:
+
+```json
+{
+    "message": "Solicitud creada correctamente.",
+    "data": {
+        "reference_code": "FF-2026-000010",
+        "status": "pending",
+        "created_at": "2026-08-20T09:48:27.000000Z"
+    }
+}
+```
+
+La aplicación genera automáticamente el `reference_code` y asigna inicialmente el estado `pending`.
+
+---
+
+## Consultar una solicitud
+
+```http
+GET /api/requests/FF-2026-000010
+Accept: application/json
+```
+
+La respuesta contiene la información completa de la solicitud:
+
+```json
+{
+    "data": {
+        "id": 10,
+        "reference_code": "FF-2026-000010",
+        "name": "Carlos López",
+        "email": "carlos.lopez@example.com",
+        "phone": "600987654",
+        "organization": "Educación",
+        "unit": "Dirección General de Innovación y Formación del Profesorado",
+        "subject": "Problema con un servicio",
+        "statement": "No puedo acceder correctamente al servicio.",
+        "request_text": "Solicito que se revise el problema.",
+        "status": "pending",
+        "category": null,
+        "priority": null,
+        "created_at": "2026-08-20T09:48:27.000000Z",
+        "updated_at": "2026-08-20T09:48:27.000000Z"
+    }
+}
+```
+
+Si el código de referencia no existe, la API devuelve:
+
+```text
+404 Not Found
+```
+
+---
+
+## Archivar una solicitud
+
+```http
+PATCH /api/requests/FF-2026-000010/archive
+Accept: application/json
+```
+
+Respuesta:
+
+```json
+{
+    "message": "Solicitud archivada correctamente.",
+    "data": {
+        "reference_code": "FF-2026-000010",
+        "status": "archived"
+    }
+}
+```
+
+La operación modifica el estado de la solicitud de `pending` a `archived` y persiste el cambio en PostgreSQL.
+
+---
+
+## Validación
+
+Las solicitudes de creación se validan mediante `StoreApplicationRequest`.
+
+Los campos obligatorios y las reglas de validación están centralizados en este `Form Request`.
+
+Si faltan campos obligatorios o los datos no cumplen las reglas establecidas, la API devuelve:
+
+```text
+422 Unprocessable Content
+```
+
+junto con los errores de validación correspondientes.
+
+---
+
+## Códigos HTTP utilizados
+
+| Código | Significado                       |
+| ------ | --------------------------------- |
+| `200`  | Operación realizada correctamente |
+| `201`  | Solicitud creada correctamente    |
+| `404`  | Solicitud no encontrada           |
+| `422`  | Datos de entrada no válidos       |
+
+---
+
+[ÍNDICE](#índice)
+## Testing
+
+El proyecto utiliza PHPUnit para realizar pruebas automatizadas de la aplicación y de la API REST.
+
+Los tests se ejecutan sobre una base de datos PostgreSQL independiente de la utilizada durante el desarrollo: ``formsflow_testing``
+
+Esto **permite mantener aislados los datos** generados durante las pruebas y **evitar que las ejecuciones** de PHPUnit **modifiquen la base de datos** de desarrollo.
+
+El entorno de testing está configurado en `phpunit.xml` y utiliza el mismo motor PostgreSQL que la aplicación. De esta forma, las pruebas también cubren características específicas de PostgreSQL utilizadas por el proyecto, como la `SEQUENCE` empleada para generar automáticamente los códigos de referencia de las solicitudes.
+
+### Ejecución de los tests
+
+Los tests se ejecutan dentro del contenedor Docker mediante:
+
+```bash
+docker compose exec app php artisan test
+```
+
+### Resultado actual
+
+La batería de pruebas actual se ejecuta correctamente:
+
+- **8 tests**
+- **28 assertions**
+- **0 errores**
+
+![Resultado de los tests](docs/images/tests_api.png)
+
+*Figura 2. Ejecución de la suite de pruebas automatizadas.*
+
+La suite incluye pruebas de:
+
+- Listado de solicitudes mediante API REST.
+- Creación de solicitudes.
+- Validación de datos de entrada.
+- Consulta de solicitudes mediante código de referencia.
+- Respuesta `404` para solicitudes inexistentes.
+- Archivado de solicitudes.
+- Persistencia de los cambios en PostgreSQL.
+- Generación y utilización del código de referencia.
+
+La estrategia de testing se ampliará progresivamente a medida que se incorporen nuevas funcionalidades al proyecto.
+
+---
+
+## Instalación
 
 ### Requisitos
 
@@ -245,62 +461,7 @@ http://localhost:8000
 
 ---
 
-## 🧪 Testing
-El proyecto utiliza PHPUnit para realizar pruebas automatizadas.
-
-Los tests se ejecutan sobre una base de datos PostgreSQL independiente
-(`formsflow_testing`) para mantener aislados los datos utilizados durante
-las pruebas de la base de datos de desarrollo.
-
-El entorno de testing está configurado en `phpunit.xml` y utiliza el mismo
-motor PostgreSQL que la aplicación. De esta forma, las pruebas también
-cubren las características específicas de PostgreSQL utilizadas por el
-proyecto.
-
-Para ejecutar la batería de tests:
-
-```bash
-docker compose exec app php artisan test
-```
-### Resultado de las pruebas
-
-La configuración de testing utiliza una base de datos PostgreSQL independiente
-de la utilizada durante el desarrollo.
-
-Actualmente, la batería de pruebas se ejecuta correctamente:
-
-- **3 tests**
-- **4 assertions**
-- **0 errores**
-
-Para ejecutar las pruebas:
-
-```bash
-docker compose exec app php artisan test
-```
-
-
-El proyecto utilizará PHPUnit para las pruebas automatizadas.
-
-Las pruebas se ejecutarán dentro del contenedor Docker:
-
-```bash
-docker compose exec app php artisan test
-```
-
-La estrategia de testing incluirá progresivamente:
-
-* Tests unitarios.
-* Tests de funcionalidades.
-* Tests de API.
-* Validación de formularios.
-* Tests de procesos de datos.
-
----
-
-## 📚 Documentación
-
-La documentación del proyecto se encuentra en evolución junto con el desarrollo.
+## Documentación
 
 Incluye:
 
@@ -314,35 +475,21 @@ Incluye:
 * Testing.
 * Despliegue.
 
-El seguimiento del desarrollo se mantiene en [`timeline.md`](timeline.md).
 
 ---
 
-## 🔗 Enlaces
+## Enlaces
 
 **Repositorio:**
+
 [https://github.com/viorbe20/formsflow](https://github.com/viorbe20/formsflow)
 
 **Demo pública:**
+
 *Pendiente de despliegue.*
 
 ---
 
-## 📄 Licencia
+##  Licencia
 
 Proyecto demostrador desarrollado con fines de portfolio y acreditación de competencias técnicas.
-
-```
-
-### Una decisión importante
-
-**Yo pondría este README ya**, pero no haría todavía un commit de todo el README definitivo. Este será nuestro **README vivo**: cada vez que implementemos una parte real, actualizamos su estado.
-
-Así evitamos el problema típico de los proyectos de portfolio: un README que promete API + ETL + IA + CI/CD, pero al entrar al código todavía no existe.
-
-Ahora mismo podemos decir honestamente:
-
-> **Infraestructura Docker + Laravel 12 + PostgreSQL funcionando.**
-
-Y mañana, cuando construyamos la primera pieza, el README avanzará con ella.
-```

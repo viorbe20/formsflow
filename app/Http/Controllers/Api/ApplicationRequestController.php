@@ -53,7 +53,7 @@ class ApplicationRequestController extends Controller
                 'status' => $applicationRequest->status,
                 'created_at' => $applicationRequest->created_at,
             ],
-        ],201);
+        ], 201);
     }
 
     /**
