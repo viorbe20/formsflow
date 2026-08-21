@@ -384,7 +384,7 @@ junto con los errores de validación correspondientes.
 | `422`  | Datos de entrada no válidos       |
 
 ---
-
+[ÍNDICE](#índice)
 ## Pipeline ETL
 
 FormsFlow incorpora un pipeline ETL que permite transformar las solicitudes almacenadas en `application_requests` en registros preparados para su explotación y posterior clasificación mediante NLP.
@@ -435,6 +435,108 @@ docker compose exec app php artisan etl:process
 ```
 
 ---
+## Automatización y explotación del dato
+
+FormsFlow incorpora un proceso automatizado para **generar informes estadísticos** a partir de los datos almacenados en `processed_requests`.
+
+El objetivo es demostrar que los datos transformados mediante el pipeline ETL pueden ser posteriormente explotados mediante procesos automatizados.
+
+### Flujo de automatización
+
+```text
+processed_requests
+        ↓
+Laravel Scheduler
+        ↓
+GenerateRequestReportJob
+        ↓
+Cálculo de estadísticas
+        ↓
+RequestReport
+        ↓
+request_reports
+---
+```
+
+### GenerateRequestReportJob
+
+El Job `GenerateRequestReportJob` se encarga de:
+
+* calcular el número total de solicitudes procesadas;
+* agrupar las solicitudes por organización;
+* agrupar las solicitudes por estado;
+* construir un informe estructurado;
+* convertir las estadísticas en arrays simples;
+* guardar el resultado en `request_reports`.
+
+Las estadísticas agrupadas por ``organización`` y ``estado`` se almacenan como JSON.
+
+### Persistencia de los informes
+
+Cada ejecución del Job genera un nuevo registro en `request_reports`.
+
+El informe contiene:
+
+* fecha y hora de generación;
+* número total de solicitudes;
+* distribución de solicitudes por organización;
+* distribución de solicitudes por estado.
+
+Esto permite conservar un histórico de los informes generados.
+
+### Scheduler
+
+La ejecución del Job se programa mediante el Scheduler de Laravel:
+
+```php
+Schedule::job(new GenerateRequestReportJob())->daily();
+```
+
+La tarea está configurada para ejecutarse una vez al día.
+
+**Nota**
+Durante el desarrollo se utilizó temporalmente `everyMinute()` para comprobar la ejecución del Scheduler sin tener que esperar a la hora programada.
+
+### Comprobación con Docker
+
+La ejecución del Scheduler se ha probado dentro del entorno Docker mediante:
+
+```bash
+docker compose exec app php artisan schedule:run
+```
+
+La tarea fue detectada y ejecutada correctamente:
+
+```text
+Running [App\Jobs\GenerateRequestReportJob] ... DONE
+```
+
+Posteriormente se verificó que el informe había sido almacenado en `request_reports`.
+
+### Decisiones de diseño
+
+Los resultados de las consultas Eloquent no se almacenan directamente como colecciones de modelos.
+
+Primero se transforman en arrays simples mediante `pluck()` y `toArray()`. Posteriormente Laravel utiliza los casts definidos en `RequestReport` para almacenar estos datos como JSON.
+
+De esta forma se separa:
+
+```text
+Consulta Eloquent
+        ↓
+Colección
+        ↓
+Datos simples
+        ↓
+Array PHP
+        ↓
+JSON
+        ↓
+PostgreSQL
+```
+
+---
+
 [ÍNDICE](#índice)
 ## Testing
 
@@ -522,6 +624,41 @@ La aplicación estará disponible en:
 ```text
 http://localhost:8000
 ```
+--- 
+## Mejoras futuras
+
+- Incorporar un proceso automático para detectar solicitudes que requieran atención, utilizando la categoría y prioridad obtenidas mediante el componente de NLP.
+- Ampliar la explotación del dato mediante nuevos indicadores y visualizaciones.
+- Incorporar nuevas reglas de automatización sobre las solicitudes clasificadas.
+- Informe de actvidad. 
+    - Como evolución del sistema, se podrá permitir que el usuario exporte el informe generado a diferentes formatos, por ejemplo:
+
+        - PDF.
+        - DOCX.
+        - CSV.
+        - Otros formatos de intercambio de datos.
+    - Una vez tengamos el informe dentro de la aplicación, podremos permitir que el usuario lo exporte, por ejemplo:
+
+        ```text
+        Informe
+        │
+        ├── Ver en pantalla
+        ├── Exportar PDF
+        ├── Exportar DOCX
+        └── Exportar CSV
+   - Posteriormente podríamos permitir: 
+        - ver informes anteriores;
+        - comparar informes; 
+        - exportarlos a PDF/DOCX/CSV.     ```
+
+- La automatización puede ampliarse posteriormente con:
+
+    * visualización de los informes desde una interfaz web;
+    * exportación de informes a PDF, DOCX o CSV;
+    * comparación entre informes de diferentes periodos;
+    * incorporación de estadísticas adicionales;
+    * integración de las categorías y prioridades obtenidas mediante el componente NLP;
+    * configuración del proceso Scheduler en el entorno de despliegue para su ejecución completamente automática.
 
 ---
 
