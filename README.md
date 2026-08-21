@@ -29,13 +29,18 @@ El proyecto está planteado como un demostrador técnico de desarrollo de soluci
 ## Índice
 
 - [Objetivo](#objetivo)
+
 - [Caso de uso](#caso-de-uso)
   - [Flujo funcional](#flujo-funcional)
+
 - [Modelo de datos](#modelo-de-datos)
   - [Datos principales de una solicitud](#datos-principales-de-una-solicitud)
   - [Tipos de solicitudes](#tipos-de-solicitudes)
+
 - [Arquitectura](#arquitectura)
+
 - [Stack tecnológico](#stack-tecnológico)
+
 - [API REST](#api-rest)
   - [Endpoints](#endpoints)
   - [Listar solicitudes](#listar-solicitudes)
@@ -44,14 +49,23 @@ El proyecto está planteado como un demostrador técnico de desarrollo de soluci
   - [Archivar una solicitud](#archivar-una-solicitud)
   - [Validación](#validación)
   - [Códigos HTTP utilizados](#códigos-http-utilizados)
+
+- [Pipeline ETL](#pipeline-etl)
+  - [Funcionamiento](#funcionamiento)
+
 - [Testing](#testing)
   - [Resultado actual](#resultado-actual)
+
 - [Instalación](#instalación)
   - [Requisitos](#requisitos)
   - [Ejecutar el proyecto](#ejecutar-el-proyecto)
+
 - [Documentación](#documentación)
+
 - [Enlaces](#enlaces)
+
 - [Licencia](#licencia)
+
 ---
 
 ## Objetivo
@@ -371,6 +385,56 @@ junto con los errores de validación correspondientes.
 
 ---
 
+## Pipeline ETL
+
+FormsFlow incorpora un pipeline ETL que permite transformar las solicitudes almacenadas en `application_requests` en registros preparados para su explotación y posterior clasificación mediante NLP.
+
+```mermaid
+flowchart LR
+    A[application_requests] --> B[Extract]
+    B --> C[Transform]
+    C --> D[Load]
+    D --> E[(processed_requests)]
+
+    C --> F[normalized_text]
+    E --> G[Explotación del dato]
+    E --> H[Clasificación NLP]
+
+    style A fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style B fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    style C fill:#dcedc8,stroke:#388e3c,stroke-width:2px
+    style D fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style E fill:#a5d6a7,stroke:#1b5e20,stroke-width:2px
+    style F fill:#f1f8e9,stroke:#558b2f,stroke-width:2px
+    style G fill:#f1f8e9,stroke:#558b2f,stroke-width:2px
+    style H fill:#f1f8e9,stroke:#558b2f,stroke-width:2px
+```
+
+### Funcionamiento
+
+**Extract**
+
+- El proceso obtiene las solicitudes almacenadas en `application_requests` mediante `RequestETLService`.
+
+**Transform**
+
+- Los datos se limpian y normalizan. 
+
+- Los campos `subject`, `statement` y `request_text` se combinan para generar `normalized_text`, que servirá como base para el procesamiento posterior.
+
+**Load**
+
+- Los datos transformados se almacenan en `processed_requests`. 
+
+- El proceso utiliza `reference_code` como identificador único y `updateOrCreate()` para evitar registros duplicados cuando el pipeline se ejecuta nuevamente.
+
+El pipeline puede ejecutarse mediante el comando Artisan:
+
+```bash
+docker compose exec app php artisan etl:process
+```
+
+---
 [ÍNDICE](#índice)
 ## Testing
 

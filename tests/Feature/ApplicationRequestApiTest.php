@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\ApplicationRequest;
+use App\Services\RequestETLService;
 use Tests\TestCase;
 
 class ApplicationRequestApiTest extends TestCase
@@ -203,6 +204,59 @@ class ApplicationRequestApiTest extends TestCase
             'reference_code' => $applicationRequest->reference_code,
             'status' => 'archived',
         ]);
+    }
+
+    /**
+    * Verify that the ETL service extracts application requests from the database.
+    */
+    public function test_etl_can_extract_application_requests(): void
+    {
+    // Create two application requests in the test database.
+    ApplicationRequest::factory()->count(2)->create();
+
+    // Create the ETL service.
+    $etl = new RequestETLService();
+
+    // Extract the application requests.
+    $requests = $etl->extract();
+
+    // The extracted collection should contain both requests.
+    $this->assertCount(2, $requests);
+    }
+
+    /**
+    * Verify that the ETL service transforms an application request correctly.
+    */
+    public function test_etl_can_transform_application_request(): void
+    {
+        // Create an application request with known text values.
+        $applicationRequest = ApplicationRequest::factory()->create([
+            'subject' => 'Problema con el servicio',
+            'statement' => 'No puedo acceder al servicio.',
+            'request_text' => 'Solicito que se revise el problema.',
+        ]);
+
+        // Create the ETL service.
+        $etl = new RequestETLService();
+
+        // Transform the application request.
+        $transformed = $etl->transform($applicationRequest);
+
+        // Verify the transformed data.
+        $this->assertSame(
+            $applicationRequest->reference_code,
+            $transformed['reference_code']
+        );
+
+        $this->assertSame(
+            'Problema con el servicio No puedo acceder al servicio. Solicito que se revise el problema.',
+            $transformed['normalized_text']
+        );
+
+        $this->assertSame(
+            $applicationRequest->status,
+            $transformed['status']
+        );
     }
 
 }
