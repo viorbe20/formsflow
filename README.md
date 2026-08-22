@@ -60,6 +60,8 @@ El proyecto está planteado como un demostrador técnico de desarrollo de soluci
   - [Requisitos](#requisitos)
   - [Ejecutar el proyecto](#ejecutar-el-proyecto)
 
+- [Mejoras futuras](#mejoras-futuras)
+
 - [Documentación](#documentación)
 
 - [Enlaces](#enlaces)
@@ -625,7 +627,26 @@ La aplicación estará disponible en:
 http://localhost:8000
 ```
 --- 
+[ÍNDICE](#índice)
 ## Mejoras futuras
+**Autenticación y gestión de usuarios**
+
+Podríamos añadir posteriormente:
+
+```
+Usuario
+   ↓
+Autenticación
+   ↓
+Rol
+   ├── Administrador
+   │     ├── gestionar usuarios
+   │     └── gestionar solicitudes
+   │
+   └── Usuario
+         ├── crear solicitudes
+         └── consultar sus solicitudes
+```
 
 - Incorporar un proceso automático para detectar solicitudes que requieran atención, utilizando la categoría y prioridad obtenidas mediante el componente de NLP.
 - Ampliar la explotación del dato mediante nuevos indicadores y visualizaciones.
@@ -660,6 +681,14 @@ http://localhost:8000
     * integración de las categorías y prioridades obtenidas mediante el componente NLP;
     * configuración del proceso Scheduler en el entorno de despliegue para su ejecución completamente automática.
 
+**Dashboard**
+- Incorporar nuevos estados de gestión, como `in_progress`, `approved` o `rejected`.
+
+- Añadir exportación de informes a PDF, DOCX o CSV.
+
+- Incorporar gráficos interactivos y filtros avanzados.
+
+- Mostraremos la distribución de solicitudes agrupadas por organismo. Inicialmente podemos mostrarlo como una **lista con barras visuales**. No necesitamos todavía una librería de gráficos.
 ---
 
 ## Documentación

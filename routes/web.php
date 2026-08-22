@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ApplicationRequestController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 // Defines the route for the application homepage.
@@ -14,3 +15,8 @@ Route::get('/requests/create', [ApplicationRequestController::class, 'create'])
 // Allows store() to receive de form
 Route::post('/requests', [ApplicationRequestController::class, 'store'])
     ->name('application-requests.store');
+
+// Define the route used to access the Dashboard.
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    // Assign a name to the route for easier reference within the application.
+    ->name('dashboard');
