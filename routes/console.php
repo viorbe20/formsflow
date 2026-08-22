@@ -1,6 +1,6 @@
 <?php
 
-use App\Jobs\GenerateRequestReportJob;
+use App\Jobs\ProcessApplicationRequestsJob;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -12,5 +12,6 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// Run the request report generation job once a day.
-Schedule::job(new GenerateRequestReportJob())->daily();
+// Run the complete ETL and reporting process once a day.
+//Schedule::job(new ProcessApplicationRequestsJob())->everyMinute();
+Schedule::job(new ProcessApplicationRequestsJob())->daily();

@@ -4,16 +4,16 @@ namespace App\Services;
 
 use App\Models\ApplicationRequest;
 use App\Models\ProcessedRequest;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\LazyCollection;
 
 class RequestETLService
 {
     /**
-     * Extract application requests from the source table.
+     * Extract application requests from the source table in batches.
      */
-    public function extract(): Collection
+    public function extract(): LazyCollection
     {
-        return ApplicationRequest::query()->get();
+        return ApplicationRequest::query()->lazyById(100);
     }
 
     /**
@@ -49,8 +49,8 @@ class RequestETLService
     }
 
     /**
-    * Load transformed data into the processed requests table.
-    */
+     * Load transformed data into the processed requests table.
+     */
     public function load(array $data): ProcessedRequest
     {
         return ProcessedRequest::updateOrCreate(
