@@ -27,12 +27,27 @@ El proyecto está planteado como un demostrador técnico de desarrollo de soluci
 ---
 
 ## Índice
+- [Descripción](#descripción)
+- [Objetivos](#objetivos)
+- [Arquitectura](#arquitectura)
+- [Funcionalidades](#funcionalidades)
+- [Flujo de datos](#flujo-de-datos)
+- [API REST](#api-rest)
+- [ETL y procesamiento NLP](#etl-y-procesamiento-nlp)
+- [Automatización](#automatización)
+- [Testing](#testing)
+- [Docker](#docker)
+- [Instalación](#instalación)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Decisiones técnicas](#decisiones-técnicas)
+- [Mejoras futuras](#mejoras-futuras)
+- [Descripción](#descripción)
 
 - [Objetivo](#objetivo)
 
 - [Caso de uso](#caso-de-uso)
   - [Flujo funcional](#flujo-funcional)
-
+- [Funcionalidades](#funcionalidades)
 - [Modelo de datos](#modelo-de-datos)
   - [Datos principales de una solicitud](#datos-principales-de-una-solicitud)
   - [Tipos de solicitudes](#tipos-de-solicitudes)
@@ -50,7 +65,7 @@ El proyecto está planteado como un demostrador técnico de desarrollo de soluci
   - [Validación](#validación)
   - [Códigos HTTP utilizados](#códigos-http-utilizados)
 
-- [Pipeline ETL](#pipeline-etl)
+- [ETL y procesamiento NLP](#etl-y-procesamiento-nlp)
   - [Funcionamiento](#funcionamiento)
 
 - [Testing](#testing)
@@ -712,6 +727,10 @@ Rol
 - Incorporar gráficos interactivos y filtros avanzados.
 
 - Mostraremos la distribución de solicitudes agrupadas por organismo. Inicialmente podemos mostrarlo como una **lista con barras visuales**. No necesitamos todavía una librería de gráficos.
+
+**Historial avanzado de solicitudes**
+
+    - Incorporación de filtros por rango de fechas, estado, categoría y prioridad para consultar el histórico completo de solicitudes.
 
 ### NPL
 **Incorporación de un modelo supervisado de clasificación de texto o un sistema basado en embeddings**

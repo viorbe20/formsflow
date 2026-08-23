@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Services\RequestETLService;
+use App\Services\RequestNLPClassifier;
 use Illuminate\Console\Command;
 
 class ProcessRequestsETL extends Command
@@ -24,12 +25,17 @@ class ProcessRequestsETL extends Command
     /**
      * Execute the console command.
      */
-    public function handle(RequestETLService $etl): int
-    {
+    public function handle(
+        RequestETLService $etl,
+        RequestNLPClassifier $classifier
+    ): int {
         $requests = $etl->extract();
 
         foreach ($requests as $request) {
-            $transformed = $etl->transform($request);
+            $transformed = $etl->transform(
+                $request,
+                $classifier
+            );
 
             $etl->load($transformed);
         }

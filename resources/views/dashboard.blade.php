@@ -89,44 +89,45 @@
                     <h2>Solicitudes por organización</h2>
                 </div>
 
-                @if ($latestReport && $latestReport->by_organization)
+            @if ($requestsByOrganization->isNotEmpty())
 
-                    <div class="organization-list">
+                <div class="organization-list">
 
-                        {{-- Get the highest number of requests to calculate relative bar widths. --}}
-                        @php
-                            $maxOrganizationTotal = max($latestReport->by_organization);
-                        @endphp
+                    {{-- Get the highest number of requests to calculate relative bar widths. --}}
+                    @php
+                        $maxOrganizationTotal = $requestsByOrganization->max('total');
+                    @endphp
 
-                        @foreach ($latestReport->by_organization as $organization => $total)
+                    @foreach ($requestsByOrganization as $organization)
 
-                            <div class="organization-row">
+                        <div class="organization-row">
 
-                                <div class="organization-info">
+                            <div class="organization-info">
 
-                                    <span class="organization-name">
-                                        {{ $organization }}
-                                    </span>
+                                <span class="organization-name">
+                                    {{ $organization->organization }}
+                                </span>
 
-                                    <strong class="organization-total">
-                                        {{ $total }}
-                                    </strong>
-
-                                </div>
-
-                                {{-- Display a proportional bar based on the highest organization total. --}}
-                                <div class="organization-bar-container">
-
-                                    <div
-                                        class="organization-bar"
-                                        style="width: {{ ($total / $maxOrganizationTotal) * 100 }}%;"
-                                    ></div>
-
-                                </div>
+                               <strong class="organization-total">
+                                    {{ $organization->total }}
+                                    ({{ number_format($organization->percentage, 1, ',', '.') }}%)
+                                </strong>
 
                             </div>
 
-                        @endforeach
+                            {{-- Display a proportional bar based on the highest organization total. --}}
+                            <div class="organization-bar-container">
+
+                                <div
+                                    class="organization-bar"
+                                    style="width: {{ ($organization->total / $maxOrganizationTotal) * 100 }}%;"
+                                ></div>
+
+                            </div>
+
+                        </div>
+
+                    @endforeach
 
                     </div>
 
@@ -141,12 +142,12 @@
             </section>
 
 
-            {{-- Requests processed during the last seven days. --}}
+            {{-- Most recent processed requests. --}}
             <section class="dashboard-section" id="requests">
 
                 <div class="section-header request-section-header">
 
-                    <h2>Solicitudes de los últimos 7 días</h2>
+                    <h2>Úlltimas solicitudes</h2>
 
                         <form
                             method="GET"
@@ -169,6 +170,15 @@
                                 Buscar
                             </button>
 
+                            <button
+                                type="button"
+                                class="btn btn-secondary dashboard-history-button"
+                                disabled
+                                title="Consulta histórica por rango de fechas — Próximamente"
+                            >
+                                Historial de solicitudes
+                            </button>
+
                             @if (request('reference'))
                                 <a
                                     href="{{ route('dashboard') }}#requests"
@@ -186,126 +196,27 @@
 
                         <table class="requests-table">
 
-                            <thead>
-                                <tr>
+                <thead>
+                    <tr>
 
-                                    {{-- Sort by reference code. --}}
-                                    <th>
-                                        <a
-                                            href="{{ request()->fullUrlWithQuery([
-                                                'sort' => 'reference_code',
-                                                'direction' => request('sort') === 'reference_code' && request('direction') === 'asc'
-                                                    ? 'desc'
-                                                    : 'asc',
-                                            ]) }}#requests"
-                                            class="table-sort-link"
-                                        >
-                                            Referencia
+                        <th>Referencia</th>
 
-                                            @if (request('sort') === 'reference_code')
-                                                {{ request('direction') === 'asc' ? '↑' : '↓' }}
-                                            @endif
-                                        </a>
-                                    </th>
+                        <th>Organización</th>
 
+                        <th>Asunto</th>
 
-                                    {{-- Sort by organization. --}}
-                                    <th>
-                                        <a
-                                            href="{{ request()->fullUrlWithQuery([
-                                                'sort' => 'organization',
-                                                'direction' => request('sort') === 'organization' && request('direction') === 'asc'
-                                                    ? 'desc'
-                                                    : 'asc',
-                                            ]) }}#requests"
-                                            class="table-sort-link"
-                                        >
-                                            Organización
+                        <th>Estado</th>
 
-                                            @if (request('sort') === 'organization')
-                                                {{ request('direction') === 'asc' ? '↑' : '↓' }}
-                                            @endif
-                                        </a>
-                                    </th>
+                        <th>Categoría</th>
 
+                        <th>Prioridad</th>
 
-                                    {{-- Sort by subject. --}}
-                                    <th>
-                                        <a
-                                            href="{{ request()->fullUrlWithQuery([
-                                                'sort' => 'subject',
-                                                'direction' => request('sort') === 'subject' && request('direction') === 'asc'
-                                                    ? 'desc'
-                                                    : 'asc',
-                                            ]) }}#requests"
-                                            class="table-sort-link"
-                                        >
-                                            Asunto
+                        <th>Fecha</th>
 
-                                            @if (request('sort') === 'subject')
-                                                {{ request('direction') === 'asc' ? '↑' : '↓' }}
-                                            @endif
-                                        </a>
-                                    </th>
+                        <th>Acción</th>
 
-
-                                    {{-- Sort by status. --}}
-                                    <th>
-                                        <a
-                                            href="{{ request()->fullUrlWithQuery([
-                                                'sort' => 'status',
-                                                'direction' => request('sort') === 'status' && request('direction') === 'asc'
-                                                    ? 'desc'
-                                                    : 'asc',
-                                            ]) }}#requests"
-                                            class="table-sort-link"
-                                        >
-                                            Estado
-
-                                            @if (request('sort') === 'status')
-                                                {{ request('direction') === 'asc' ? '↑' : '↓' }}
-                                            @endif
-                                        </a>
-                                    </th>
-
-                                    {{-- Display the NLP classification category. --}}
-                                    <th>
-                                        Categoría
-                                    </th>
-
-
-                                    {{-- Display the NLP priority level. --}}
-                                    <th>
-                                        Prioridad
-                                    </th>
-
-                                    {{-- Sort by processing date. --}}
-                                    <th>
-                                        <a
-                                            href="{{ request()->fullUrlWithQuery([
-                                                'sort' => 'processed_at',
-                                                'direction' => request('sort') === 'processed_at' && request('direction') === 'asc'
-                                                    ? 'desc'
-                                                    : 'asc',
-                                            ]) }}#requests"
-                                            class="table-sort-link"
-                                        >
-                                            Fecha
-
-                                            @if (request('sort') === 'processed_at')
-                                                {{ request('direction') === 'asc' ? '↑' : '↓' }}
-                                            @endif
-                                        </a>
-                                    </th>
-
-
-                                    {{-- Actions are not sortable. --}}
-                                    <th>
-                                        Acción
-                                    </th>
-
-                                </tr>
-                            </thead>
+                    </tr>
+                </thead>
 
 
                             <tbody>
@@ -389,36 +300,36 @@
                                         </td>
 
 
-                                        {{-- Display the NLP priority level. --}}
-                                        <td>
+                                    {{-- Display the NLP priority level. --}}
+                                    <td>
 
-                                            @if ($request->priority === 'baja')
+                                        @if ($request->priority === 'baja')
 
-                                                <span class="nlp-badge priority-low">
-                                                    Baja
-                                                </span>
+                                            <span class="nlp-badge priority-low">
+                                                Baja
+                                            </span>
 
-                                            @elseif ($request->priority === 'media')
+                                        @elseif ($request->priority === 'media')
 
-                                                <span class="nlp-badge priority-medium">
-                                                    Media
-                                                </span>
+                                            <span class="nlp-badge priority-medium">
+                                                Media
+                                            </span>
 
-                                            @elseif ($request->priority === 'alta')
+                                        @elseif ($request->priority === 'alta')
 
-                                                <span class="nlp-badge priority-high">
-                                                    Alta
-                                                </span>
+                                            <span class="nlp-badge priority-high">
+                                                Alta
+                                            </span>
 
-                                            @else
+                                        @else
 
-                                                <span class="nlp-badge">
-                                                    —
-                                                </span>
+                                            <span class="nlp-badge">
+                                                —
+                                            </span>
 
-                                            @endif
+                                        @endif
 
-                                        </td>
+                                    </td>
                                         {{-- Display the date and time when the request was processed. --}}
                                         <td class="request-date">
 
@@ -470,7 +381,7 @@
                 @else
 
                     <p class="empty-message">
-                        No hay solicitudes procesadas durante los últimos 7 días.
+                        No hay solicitudes disponibles.
                     </p>
 
                 @endif

@@ -100,4 +100,36 @@ class RequestNLPClassifierTest extends TestCase
         $this->assertSame('incidencia', $result['category']);
         $this->assertSame('media', $result['priority']);
     }
+
+    /**
+     * Verify that a documentation request remains classified as documentation
+     * when it also contains a generic information-related term.
+     */
+    public function test_documentation_request_with_procedure_is_classified_correctly(): void
+    {
+        // Classify a documentation request containing the generic "trámite" term.
+        $result = $this->classifier->classify(
+            'Necesito la documentación necesaria para completar el trámite.'
+        );
+
+        // Documentation should remain the dominant category.
+        $this->assertSame('documentacion', $result['category']);
+        $this->assertSame('baja', $result['priority']);
+    }
+
+    /**
+     * Verify that an unavailable service is classified as an incident
+     * with high priority.
+     */
+    public function test_unavailable_service_is_classified_as_high_priority_incident(): void
+    {
+        // Classify an unavailable service affecting the request process.
+        $result = $this->classifier->classify(
+            'El servicio no está disponible y necesito completar la solicitud con urgencia.'
+        );
+
+        // An unavailable service should be treated as a high-priority incident.
+        $this->assertSame('incidencia', $result['category']);
+        $this->assertSame('alta', $result['priority']);
+    }
 }

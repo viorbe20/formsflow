@@ -53,16 +53,18 @@ class RequestNLPClassifier
                 'problema' => 2,
                 'error' => 3,
                 'fallo' => 3,
+                'incidencia' => 3,
+                'bloqueado' => 3,
                 'no funciona' => 3,
                 'no puedo acceder' => 3,
                 'no puedo completar' => 3,
                 'no permite' => 3,
-                'bloqueado' => 3,
+                'no disponible' => 3,
             ],
 
             RequestCategory::DOCUMENTATION->value => [
-                'documentacion' => 2,
-                'documento' => 2,
+                'documentacion' => 3,
+                'documento' => 3,
                 'certificado' => 2,
                 'justificante' => 2,
                 'acreditacion' => 2,
@@ -91,7 +93,7 @@ class RequestNLPClassifier
     private function classifyPriority(string $text): string
     {
         $highPriorityTerms = [
-            'servicio no disponible' => 3,
+            'no disponible' => 3,
             'todos los usuarios' => 3,
             'ningun usuario' => 3,
             'ninguna solicitud' => 3,
@@ -143,11 +145,33 @@ class RequestNLPClassifier
         $score = 0;
 
         foreach ($terms as $term => $weight) {
-            if (str_contains($text, $term)) {
+            if ($this->matchesTerm($text, $term)) {
                 $score += $weight;
             }
         }
 
         return $score;
+    }
+
+    /**
+     * Determine whether a term or flexible pattern is present.
+     */
+    private function matchesTerm(string $text, string $term): bool
+    {
+        if ($term === 'no disponible') {
+            return preg_match(
+                '/\bno\s+(?:esta|se encuentra|esta actualmente)?\s*disponible\b/',
+                $text
+            ) === 1;
+        }
+
+        if (str_contains($term, ' ')) {
+            return str_contains($text, $term);
+        }
+
+        return str_contains(
+            ' '.$text.' ',
+            ' '.$term.' '
+        );
     }
 }

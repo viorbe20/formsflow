@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\ProcessedRequest;
 use App\Models\RequestReport;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -15,28 +14,6 @@ class DashboardController extends Controller
         // Retrieve the most recently generated report.
         $latestReport = RequestReport::latest('generated_at')->first();
 
-        // Define the database columns that can be used for sorting.
-        $allowedSorts = [
-            'reference_code',
-            'organization',
-            'subject',
-            'status',
-            'processed_at',
-        ];
-
-        // Get the requested sort column and direction from the query string.
-        $sort = $request->query('sort', 'processed_at');
-        $direction = $request->query('direction', 'desc');
-
-        // Validate the requested sorting parameters.
-        if (! in_array($sort, $allowedSorts, true)) {
-            $sort = 'processed_at';
-        }
-
-        if (! in_array($direction, ['asc', 'desc'], true)) {
-            $direction = 'desc';
-        }
-
         // Retrieve the reference entered by the user.
         $reference = trim($request->query('reference', ''));
 
@@ -44,31 +21,45 @@ class DashboardController extends Controller
         $query = ProcessedRequest::query();
 
         // Search by reference when a reference is provided.
-        // Otherwise, display only requests processed during the last seven days.
         if ($reference !== '') {
             $query->where(
                 'reference_code',
                 'like',
                 '%'.$reference.'%'
             );
-        } else {
-            $query->where(
-                'processed_at',
-                '>=',
-                Carbon::now()->subDays(7)
-            );
         }
 
-        // Apply sorting and server-side pagination.
+        // Display the 20 most recent processed requests.
+        // Pagination shows 10 requests per page.
         $recentRequests = $query
-            ->orderBy($sort, $direction)
+            ->orderBy('processed_at', 'desc')
             ->orderBy('id', 'desc')
+            ->limit(20)
             ->paginate(10)
             ->withQueryString();
+
+        // Calculate organization statistics using all processed requests.
+        // These statistics are independent from pagination and reference search.
+        $totalRequests = ProcessedRequest::count();
+
+        $requestsByOrganization = ProcessedRequest::query()
+            ->selectRaw('organization, COUNT(*) as total')
+            ->groupBy('organization')
+            ->orderByDesc('total')
+            ->get()
+            ->map(function ($organization) use ($totalRequests) {
+                $organization->percentage = $totalRequests > 0
+                    ? round(($organization->total / $totalRequests) * 100, 1)
+                    : 0;
+
+                return $organization;
+            });
 
         return view('dashboard', [
             'latestReport' => $latestReport,
             'recentRequests' => $recentRequests,
+            'totalRequests' => $totalRequests,
+            'requestsByOrganization' => $requestsByOrganization,
         ]);
     }
 }
