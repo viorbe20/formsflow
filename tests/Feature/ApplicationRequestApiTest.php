@@ -2,9 +2,10 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\ApplicationRequest;
 use App\Services\RequestETLService;
+use App\Services\RequestNLPClassifier;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ApplicationRequestApiTest extends TestCase
@@ -21,7 +22,7 @@ class ApplicationRequestApiTest extends TestCase
     public function test_can_list_stored_application_requests(): void
     {
         // Create a test application request in the database.
-        $applicationRequest = \App\Models\ApplicationRequest::factory()->create();
+        $applicationRequest = ApplicationRequest::factory()->create();
 
         // Request the list of application requests.
         $response = $this->getJson('/api/requests');
@@ -111,7 +112,7 @@ class ApplicationRequestApiTest extends TestCase
             'request_text',
         ]);
     }
-    
+
     /**
      * Verify that an application request can be retrieved by its reference code.
      *
@@ -124,7 +125,7 @@ class ApplicationRequestApiTest extends TestCase
 
         // Request the application request using its reference code.
         $response = $this->getJson(
-            '/api/requests/' . $applicationRequest->reference_code
+            '/api/requests/'.$applicationRequest->reference_code
         );
 
         // The endpoint should respond with HTTP 200 OK.
@@ -160,7 +161,7 @@ class ApplicationRequestApiTest extends TestCase
 
         // Request the non-existing application request.
         $response = $this->getJson(
-            '/api/requests/' . $referenceCode
+            '/api/requests/'.$referenceCode
         );
 
         // The API should return HTTP 404 Not Found.
@@ -176,13 +177,13 @@ class ApplicationRequestApiTest extends TestCase
     public function test_can_archive_application_request(): void
     {
         // Create a pending application request in the database.
-        $applicationRequest = \App\Models\ApplicationRequest::factory()->create([
+        $applicationRequest = ApplicationRequest::factory()->create([
             'status' => 'pending',
         ]);
 
         // Archive the application request through the API.
         $response = $this->patchJson(
-            '/api/requests/' . $applicationRequest->reference_code . '/archive'
+            '/api/requests/'.$applicationRequest->reference_code.'/archive'
         );
 
         // The API should respond with HTTP 200 OK.
@@ -207,26 +208,26 @@ class ApplicationRequestApiTest extends TestCase
     }
 
     /**
-    * Verify that the ETL service extracts application requests from the database.
-    */
+     * Verify that the ETL service extracts application requests from the database.
+     */
     public function test_etl_can_extract_application_requests(): void
     {
-    // Create two application requests in the test database.
-    ApplicationRequest::factory()->count(2)->create();
+        // Create two application requests in the test database.
+        ApplicationRequest::factory()->count(2)->create();
 
-    // Create the ETL service.
-    $etl = new RequestETLService();
+        // Create the ETL service.
+        $etl = new RequestETLService;
 
-    // Extract the application requests.
-    $requests = $etl->extract();
+        // Extract the application requests.
+        $requests = $etl->extract();
 
-    // The extracted collection should contain both requests.
-    $this->assertCount(2, $requests);
+        // The extracted collection should contain both requests.
+        $this->assertCount(2, $requests);
     }
 
     /**
-    * Verify that the ETL service transforms an application request correctly.
-    */
+     * Verify that the ETL service transforms an application request correctly.
+     */
     public function test_etl_can_transform_application_request(): void
     {
         // Create an application request with known text values.
@@ -236,11 +237,15 @@ class ApplicationRequestApiTest extends TestCase
             'request_text' => 'Solicito que se revise el problema.',
         ]);
 
-        // Create the ETL service.
-        $etl = new RequestETLService();
+        // Create the ETL service and NLP classifier.
+        $etl = new RequestETLService;
+        $classifier = new RequestNLPClassifier;
 
-        // Transform the application request.
-        $transformed = $etl->transform($applicationRequest);
+        // Transform and classify the application request.
+        $transformed = $etl->transform(
+            $applicationRequest,
+            $classifier
+        );
 
         // Verify the transformed data.
         $this->assertSame(
@@ -257,6 +262,15 @@ class ApplicationRequestApiTest extends TestCase
             $applicationRequest->status,
             $transformed['status']
         );
-    }
 
+        $this->assertSame(
+            'incidencia',
+            $transformed['category']
+        );
+
+        $this->assertSame(
+            'media',
+            $transformed['priority']
+        );
+    }
 }

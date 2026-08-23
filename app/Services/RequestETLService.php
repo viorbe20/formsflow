@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ApplicationRequest;
 use App\Models\ProcessedRequest;
+use App\Services\RequestNLPClassifier;
 use Illuminate\Support\LazyCollection;
 
 class RequestETLService
@@ -20,7 +21,10 @@ class RequestETLService
      * Transform an application request into the data structure
      * required by the processed requests table.
      */
-    public function transform(ApplicationRequest $request): array
+    public function transform(
+        ApplicationRequest $request,
+        RequestNLPClassifier $classifier
+    ): array
     {
         $normalizedText = implode(' ', [
             $request->subject,
@@ -34,6 +38,8 @@ class RequestETLService
             trim($normalizedText)
         );
 
+        $classification = $classifier->classify($normalizedText);
+
         return [
             'reference_code' => $request->reference_code,
             'organization' => trim($request->organization),
@@ -41,8 +47,8 @@ class RequestETLService
             'subject' => trim($request->subject),
             'normalized_text' => $normalizedText,
             'status' => $request->status,
-            'category' => $request->category,
-            'priority' => $request->priority,
+            'category' => $classification['category'],
+            'priority' => $classification['priority'],
             'source_created_at' => $request->created_at,
             'processed_at' => now(),
         ];

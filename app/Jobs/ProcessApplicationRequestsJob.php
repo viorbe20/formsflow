@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Services\RequestETLService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use App\Services\RequestNLPClassifier;
 
 class ProcessApplicationRequestsJob implements ShouldQueue
 {
@@ -21,14 +22,17 @@ class ProcessApplicationRequestsJob implements ShouldQueue
     /**
      * Execute the ETL process.
      */
-    public function handle(RequestETLService $etl): void
+    public function handle(
+        RequestETLService $etl,
+        RequestNLPClassifier $classifier
+    ): void
     {
         // Extract application requests progressively from the source table.
         foreach ($etl->extract() as $request) {
 
             // Transform and load each application request.
             $etl->load(
-                $etl->transform($request)
+                $etl->transform($request, $classifier)
             );
         }
 
