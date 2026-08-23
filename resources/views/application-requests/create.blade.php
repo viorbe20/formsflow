@@ -4,16 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    @vite('resources/js/app.js')
+    @vite([
+        'resources/scss/app.scss',
+        'resources/js/app.js',
+    ])
 
     <title>Nueva solicitud</title>
 </head>
-<body>
 
-    <h1>Nueva solicitud</h1>
+<body class="application-form-page">
+
+    <header class="application-form-header">
+        <div>
+            <span class="application-form-brand">FORMSFLOW</span>
+
+            <h1>Nueva solicitud</h1>
+
+            <p>Registro de una nueva solicitud</p>
+        </div>
+    </header>
 
     @if (session('success'))
-        <div>
+        <div class="application-form-message application-form-success">
             <h2>{{ session('success') }}</h2>
 
             <p>
@@ -24,7 +36,7 @@
     @endif
 
     @if ($errors->any())
-        <div>
+        <div class="application-form-message application-form-errors">
             <strong>Se han producido los siguientes errores:</strong>
 
             <ul>
@@ -35,209 +47,253 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('application-requests.store') }}">
+    <main class="application-form-content">
 
-        @csrf
+        <section class="application-form-card">
 
-        <div>
-            <label for="name">Nombre</label>
+            <div class="application-form-section">
+                <h2>Datos de contacto</h2>
+            </div>
 
-            <input
-                type="text"
-                id="name"
-                name="name"
-                value="{{ old('name') }}"
-                @error('name')
-                    aria-invalid="true"
-                    aria-describedby="name-error"
-                @enderror
-                required
-            >
+            <form method="POST" action="{{ route('application-requests.store') }}">
 
-            @error('name')
-                <p id="name-error">{{ $message }}</p>
-            @enderror
-        </div>
+                @csrf
 
-        <div>
-            <label for="email">Correo electrónico</label>
+                <div class="application-form-grid">
 
-            <input
-                type="email"
-                id="email"
-                name="email"
-                value="{{ old('email') }}"
-                @error('email')
-                    aria-invalid="true"
-                    aria-describedby="email-error"
-                @enderror
-                required
-            >
+                    <div class="application-form-field">
+                        <label for="name">Nombre</label>
 
-            @error('email')
-                <p id="email-error">{{ $message }}</p>
-            @enderror
-        </div>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            value="{{ old('name') }}"
+                            @error('name')
+                                aria-invalid="true"
+                                aria-describedby="name-error"
+                            @enderror
+                            required
+                        >
 
-        <div>
-            <label for="phone">Teléfono</label>
+                        @error('name')
+                            <p id="name-error" class="application-form-error">
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
 
-            <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value="{{ old('phone') }}"
-                @error('phone')
-                    aria-invalid="true"
-                    aria-describedby="phone-error"
-                @enderror
-            >
+                    <div class="application-form-field">
+                        <label for="email">Correo electrónico</label>
 
-            @error('phone')
-                <p id="phone-error">{{ $message }}</p>
-            @enderror
-        </div>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value="{{ old('email') }}"
+                            @error('email')
+                                aria-invalid="true"
+                                aria-describedby="email-error"
+                            @enderror
+                            required
+                        >
 
-        <div>
-            <label for="organization">Consejería</label>
+                        @error('email')
+                            <p id="email-error" class="application-form-error">
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
 
-            <select
-                id="organization"
-                name="organization"
-                @error('organization')
-                    aria-invalid="true"
-                    aria-describedby="organization-error"
-                @enderror
-                required
-            >
-                <option value="">Seleccione una Consejería</option>
+                    <div class="application-form-field">
+                        <label for="phone">Teléfono</label>
 
-                <option value="Economía, Hacienda y Fondos Europeos"
-                    {{ old('organization') === 'Economía, Hacienda y Fondos Europeos' ? 'selected' : '' }}>
-                    Economía, Hacienda y Fondos Europeos
-                </option>
+                        <input
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            value="{{ old('phone') }}"
+                            @error('phone')
+                                aria-invalid="true"
+                                aria-describedby="phone-error"
+                            @enderror
+                        >
 
-                <option value="Educación"
-                    {{ old('organization') === 'Educación' ? 'selected' : '' }}>
-                    Educación
-                </option>
+                        @error('phone')
+                            <p id="phone-error" class="application-form-error">
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
 
-                <option value="IA, Desarrollo Digital y Administración Pública"
-                    {{ old('organization') === 'IA, Desarrollo Digital y Administración Pública' ? 'selected' : '' }}>
-                    IA, Desarrollo Digital y Administración Pública
-                </option>
+                </div>
 
-                <option value="Presidencia, Sanidad y Emergencias"
-                    {{ old('organization') === 'Presidencia, Sanidad y Emergencias' ? 'selected' : '' }}>
-                    Presidencia, Sanidad y Emergencias
-                </option>
-            </select>
+                <div class="application-form-section">
+                    <h2>Datos de la solicitud</h2>
+                </div>
 
-            @error('organization')
-                <p id="organization-error">{{ $message }}</p>
-            @enderror
-        </div>
+                <div class="application-form-grid">
 
-        <div>
-            <label for="unit">Unidad destinataria</label>
+                    <div class="application-form-field">
+                        <label for="organization">Consejería</label>
 
-            <select
-                id="unit"
-                name="unit"
-                data-old="{{ old('unit') }}"
-                @error('unit')
-                    aria-invalid="true"
-                    aria-describedby="unit-error"
-                @enderror
-                required
-            >
-                <option value="">Seleccione primero una Consejería</option>
-            </select>
+                        <select
+                            id="organization"
+                            name="organization"
+                            @error('organization')
+                                aria-invalid="true"
+                                aria-describedby="organization-error"
+                            @enderror
+                            required
+                        >
+                            <option value="">Seleccione una Consejería</option>
 
-            @error('unit')
-                <p id="unit-error">{{ $message }}</p>
-            @enderror
-        </div>
+                            <option value="Economía, Hacienda y Fondos Europeos"
+                                {{ old('organization') === 'Economía, Hacienda y Fondos Europeos' ? 'selected' : '' }}>
+                                Economía, Hacienda y Fondos Europeos
+                            </option>
 
-        <div>
-    <label for="subject">Asunto</label>
+                            <option value="Educación"
+                                {{ old('organization') === 'Educación' ? 'selected' : '' }}>
+                                Educación
+                            </option>
 
-    <select
-        id="subject"
-        name="subject"
-        @error('subject')
-            aria-invalid="true"
-            aria-describedby="subject-error"
-        @enderror
-        required
-    >
-        <option value="">Seleccione un asunto</option>
+                            <option value="IA, Desarrollo Digital y Administración Pública"
+                                {{ old('organization') === 'IA, Desarrollo Digital y Administración Pública' ? 'selected' : '' }}>
+                                IA, Desarrollo Digital y Administración Pública
+                            </option>
 
-        <option value="Información sobre un procedimiento"
-            {{ old('subject') === 'Información sobre un procedimiento' ? 'selected' : '' }}>
-            Información sobre un procedimiento
-        </option>
+                            <option value="Presidencia, Sanidad y Emergencias"
+                                {{ old('organization') === 'Presidencia, Sanidad y Emergencias' ? 'selected' : '' }}>
+                                Presidencia, Sanidad y Emergencias
+                            </option>
+                        </select>
 
-        <option value="Problema con un servicio"
-            {{ old('subject') === 'Problema con un servicio' ? 'selected' : '' }}>
-            Problema con un servicio
-        </option>
+                        @error('organization')
+                            <p id="organization-error" class="application-form-error">
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
 
-        <option value="Solicitud de documentación"
-            {{ old('subject') === 'Solicitud de documentación' ? 'selected' : '' }}>
-            Solicitud de documentación
-        </option>
+                    <div class="application-form-field">
+                        <label for="unit">Unidad destinataria</label>
 
-        <option value="Otros"
-            {{ old('subject') === 'Otros' ? 'selected' : '' }}>
-            Otros
-        </option>
-    </select>
+                        <select
+                            id="unit"
+                            name="unit"
+                            data-old="{{ old('unit') }}"
+                            @error('unit')
+                                aria-invalid="true"
+                                aria-describedby="unit-error"
+                            @enderror
+                            required
+                        >
+                            <option value="">Seleccione primero una Consejería</option>
+                        </select>
 
-    @error('subject')
-        <p id="subject-error">{{ $message }}</p>
-    @enderror
-</div>
+                        @error('unit')
+                            <p id="unit-error" class="application-form-error">
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
 
-        <div>
-            <label for="statement">Expone</label>
+                    <div class="application-form-field application-form-field-full">
+                        <label for="subject">Asunto</label>
 
-            <textarea
-                id="statement"
-                name="statement"
-                @error('statement')
-                    aria-invalid="true"
-                    aria-describedby="statement-error"
-                @enderror
-                required
-            >{{ old('statement') }}</textarea>
+                        <select
+                            id="subject"
+                            name="subject"
+                            @error('subject')
+                                aria-invalid="true"
+                                aria-describedby="subject-error"
+                            @enderror
+                            required
+                        >
+                            <option value="">Seleccione un asunto</option>
 
-            @error('statement')
-                <p id="statement-error">{{ $message }}</p>
-            @enderror
-        </div>
+                            <option value="Información sobre un procedimiento"
+                                {{ old('subject') === 'Información sobre un procedimiento' ? 'selected' : '' }}>
+                                Información sobre un procedimiento
+                            </option>
 
-        <div>
-            <label for="request_text">Solicita</label>
+                            <option value="Problema con un servicio"
+                                {{ old('subject') === 'Problema con un servicio' ? 'selected' : '' }}>
+                                Problema con un servicio
+                            </option>
 
-            <textarea
-                id="request_text"
-                name="request_text"
-                @error('request_text')
-                    aria-invalid="true"
-                    aria-describedby="request-text-error"
-                @enderror
-                required
-            >{{ old('request_text') }}</textarea>
+                            <option value="Solicitud de documentación"
+                                {{ old('subject') === 'Solicitud de documentación' ? 'selected' : '' }}>
+                                Solicitud de documentación
+                            </option>
 
-            @error('request_text')
-                <p id="request-text-error">{{ $message }}</p>
-            @enderror
-        </div>
+                            <option value="Otros"
+                                {{ old('subject') === 'Otros' ? 'selected' : '' }}>
+                                Otros
+                            </option>
+                        </select>
 
-        <button type="submit">Enviar solicitud</button>
+                        @error('subject')
+                            <p id="subject-error" class="application-form-error">
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
 
-    </form>
+                    <div class="application-form-field application-form-field-full">
+                        <label for="statement">Expone</label>
+
+                        <textarea
+                            id="statement"
+                            name="statement"
+                            @error('statement')
+                                aria-invalid="true"
+                                aria-describedby="statement-error"
+                            @enderror
+                            required
+                        >{{ old('statement') }}</textarea>
+
+                        @error('statement')
+                            <p id="statement-error" class="application-form-error">
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+
+                    <div class="application-form-field application-form-field-full">
+                        <label for="request_text">Solicita</label>
+
+                        <textarea
+                            id="request_text"
+                            name="request_text"
+                            @error('request_text')
+                                aria-invalid="true"
+                                aria-describedby="request-text-error"
+                            @enderror
+                            required
+                        >{{ old('request_text') }}</textarea>
+
+                        @error('request_text')
+                            <p id="request-text-error" class="application-form-error">
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+
+                </div>
+
+                <div class="application-form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        Enviar solicitud
+                    </button>
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
 
 </body>
 </html>

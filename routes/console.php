@@ -13,5 +13,5 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 // Run the complete ETL and reporting process once a day.
-//Schedule::job(new ProcessApplicationRequestsJob())->everyMinute();
-Schedule::job(new ProcessApplicationRequestsJob())->daily();
+// Schedule::job(new ProcessApplicationRequestsJob())->everyMinute();
+Schedule::job(new ProcessApplicationRequestsJob)->daily();

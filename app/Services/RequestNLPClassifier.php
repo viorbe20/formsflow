@@ -132,6 +132,7 @@ class RequestNLPClassifier
 
         return RequestPriority::LOW->value;
     }
+
     /**
      * Calculate the score obtained from matching terms.
      */

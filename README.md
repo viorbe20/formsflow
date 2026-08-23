@@ -60,6 +60,8 @@ El proyecto está planteado como un demostrador técnico de desarrollo de soluci
   - [Requisitos](#requisitos)
   - [Ejecutar el proyecto](#ejecutar-el-proyecto)
 
+- [Pruebas del clasificador NLP]
+
 - [Mejoras futuras](#mejoras-futuras)
 
 - [Documentación](#documentación)
@@ -626,10 +628,19 @@ La aplicación estará disponible en:
 ```text
 http://localhost:8000
 ```
+
+---
+[ÍNDICE](#índice)
+## Pruebas del clasificador NLP
+El clasificador dispone de pruebas unitarias para verificar
+la asignación de categorías y niveles de prioridad.
+
+![NLP classifier tests](docs/images/nlp-tests.png)
 --- 
 [ÍNDICE](#índice)
 ## Mejoras futuras
-**Autenticación y gestión de usuarios**
+
+### Autenticación y gestión de usuarios
 
 Podríamos añadir posteriormente:
 
@@ -681,7 +692,19 @@ Rol
     * integración de las categorías y prioridades obtenidas mediante el componente NLP;
     * configuración del proceso Scheduler en el entorno de despliegue para su ejecución completamente automática.
 
-**Dashboard**
+### Formulario de solicitud
+
+- **Descarga de una copia de la solicitud**
+
+    Como futura mejora, se podría incorporar la posibilidad de que el usuario descargue una copia de la solicitud una vez registrada, incluyendo sus datos principales y el código de referencia generado por FormsFlow.
+
+    Esta funcionalidad permitiría al usuario conservar un justificante del registro y facilitaría la trazabilidad de la solicitud.
+
+    La generación del documento podría implementarse, por ejemplo, mediante un PDF generado automáticamente a partir de los datos registrados.
+
+    Esta funcionalidad queda fuera del alcance de la versión actual para mantener el proyecto centrado en el flujo principal de registro, procesamiento, integración, automatización y explotación de datos.
+
+### Dashboard
 - Incorporar nuevos estados de gestión, como `in_progress`, `approved` o `rejected`.
 
 - Añadir exportación de informes a PDF, DOCX o CSV.
@@ -689,6 +712,19 @@ Rol
 - Incorporar gráficos interactivos y filtros avanzados.
 
 - Mostraremos la distribución de solicitudes agrupadas por organismo. Inicialmente podemos mostrarlo como una **lista con barras visuales**. No necesitamos todavía una librería de gráficos.
+
+### NPL
+**Incorporación de un modelo supervisado de clasificación de texto o un sistema basado en embeddings**
+
+- Para la primera versión utilizaremos un **clasificador basado en reglas y palabras clave ponderadas**. Como futura evolución se podría sustituir este clasificador por un modelo estadístico o de aprendizaje automático manteniendo la misma interfaz de entrada y salida. No incorporaremos inicialmente:
+
+    * modelos de lenguaje externos;
+    * APIs de terceros;
+    * modelos entrenados con grandes datasets;
+    * embeddings;
+    * infraestructura adicional;
+    * servicios cloud de IA.
+
 ---
 
 ## Documentación

@@ -40,10 +40,69 @@ document.addEventListener('DOMContentLoaded', () => {
             modalOrganization.textContent = button.dataset.organization;
             modalUnit.textContent = button.dataset.unit;
             modalSubject.textContent = button.dataset.subject;
-            modalCategory.textContent = button.dataset.category || '—';
-            modalPriority.textContent = button.dataset.priority || '—';
             modalProcessedAt.textContent = button.dataset.processedAt;
             modalText.textContent = button.dataset.text;
+            // Convert the NLP category into a user-friendly label.
+            const categoryLabels = {
+                informacion: 'Información',
+                incidencia: 'Incidencia',
+                documentacion: 'Documentación',
+            };
+
+            const category = button.dataset.category;
+
+            modalCategory.textContent =
+                categoryLabels[category] ?? '—';
+
+            modalCategory.classList.remove(
+                'nlp-badge',
+                'nlp-category'
+            );
+
+            if (category) {
+                modalCategory.classList.add(
+                    'nlp-badge',
+                    'nlp-category'
+                );
+            }
+
+
+            // Convert the NLP priority into a user-friendly label.
+            const priorityLabels = {
+                baja: 'Baja',
+                media: 'Media',
+                alta: 'Alta',
+            };
+
+            const priority = button.dataset.priority;
+
+            modalPriority.textContent =
+                priorityLabels[priority] ?? '—';
+
+            modalPriority.classList.remove(
+                'nlp-badge',
+                'priority-low',
+                'priority-medium',
+                'priority-high'
+            );
+
+            if (priority === 'baja') {
+                modalPriority.classList.add(
+                    'nlp-badge',
+                    'priority-low'
+                );
+            } else if (priority === 'media') {
+                modalPriority.classList.add(
+                    'nlp-badge',
+                    'priority-medium'
+                );
+            } else if (priority === 'alta') {
+                modalPriority.classList.add(
+                    'nlp-badge',
+                    'priority-high'
+                );
+            }
+
             // Convert the internal status value into a user-friendly label.
             const statusLabels = {
                 pending: 'Pendiente',

@@ -12,7 +12,7 @@
     'resources/scss/app.scss',
     'resources/js/app.js'
     ])
-    
+
 </head>
 
 <body class="dashboard-page">
@@ -268,6 +268,16 @@
                                         </a>
                                     </th>
 
+                                    {{-- Display the NLP classification category. --}}
+                                    <th>
+                                        Categoría
+                                    </th>
+
+
+                                    {{-- Display the NLP priority level. --}}
+                                    <th>
+                                        Prioridad
+                                    </th>
 
                                     {{-- Sort by processing date. --}}
                                     <th>
@@ -347,7 +357,68 @@
 
                                         </td>
 
+                                        {{-- Display the NLP classification category. --}}
+                                        <td>
 
+                                            @if ($request->category === 'informacion')
+
+                                                <span class="nlp-badge nlp-category">
+                                                    Información
+                                                </span>
+
+                                            @elseif ($request->category === 'incidencia')
+
+                                                <span class="nlp-badge nlp-category">
+                                                    Incidencia
+                                                </span>
+
+                                            @elseif ($request->category === 'documentacion')
+
+                                                <span class="nlp-badge nlp-category">
+                                                    Documentación
+                                                </span>
+
+                                            @else
+
+                                                <span class="nlp-badge">
+                                                    —
+                                                </span>
+
+                                            @endif
+
+                                        </td>
+
+
+                                        {{-- Display the NLP priority level. --}}
+                                        <td>
+
+                                            @if ($request->priority === 'baja')
+
+                                                <span class="nlp-badge priority-low">
+                                                    Baja
+                                                </span>
+
+                                            @elseif ($request->priority === 'media')
+
+                                                <span class="nlp-badge priority-medium">
+                                                    Media
+                                                </span>
+
+                                            @elseif ($request->priority === 'alta')
+
+                                                <span class="nlp-badge priority-high">
+                                                    Alta
+                                                </span>
+
+                                            @else
+
+                                                <span class="nlp-badge">
+                                                    —
+                                                </span>
+
+                                            @endif
+
+                                        </td>
                                         {{-- Display the date and time when the request was processed. --}}
                                         <td class="request-date">
 

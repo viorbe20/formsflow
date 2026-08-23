@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ApplicationRequest extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
         'reference_code',
         'name',
@@ -26,8 +26,8 @@ class ApplicationRequest extends Model
     ];
 
     /**
-    * Generate the application request reference code before creation.
-    */
+     * Generate the application request reference code before creation.
+     */
     protected static function booted(): void
     {
         static::creating(function (ApplicationRequest $applicationRequest) {

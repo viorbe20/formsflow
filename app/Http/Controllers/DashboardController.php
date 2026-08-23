@@ -49,7 +49,7 @@ class DashboardController extends Controller
             $query->where(
                 'reference_code',
                 'like',
-                '%' . $reference . '%'
+                '%'.$reference.'%'
             );
         } else {
             $query->where(

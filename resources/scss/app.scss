@@ -277,6 +277,39 @@
     color: #236b55;
 }
 
+/* NLP classification values inside the dashboard table */
+
+.nlp-category {
+    color: #245b7a;
+    font-weight: 600;
+}
+
+.nlp-badge {
+    display: inline-block;
+
+    padding: 5px 10px;
+
+    border-radius: 999px;
+
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.nlp-badge.priority-low {
+    background-color: #e1f3ec;
+    color: #236b55;
+}
+
+.nlp-badge.priority-medium {
+    background-color: #fff4d6;
+    color: #946200;
+}
+
+.nlp-badge.priority-high {
+    background-color: #f9dada;
+    color: #9b2c2c;
+}
+
 .request-reference {
     font-weight: 600;
     white-space: nowrap;
@@ -413,7 +446,6 @@
 .request-modal.is-visible {
     display: flex;
 }
-
 
 .request-modal-content {
     width: 100%;
@@ -580,10 +612,45 @@
     font-weight: 600;
 }
 
+/* NLP classification badges inside the detail modal */
+
+.request-detail-grid strong.nlp-badge {
+    display: inline-block;
+
+    width: fit-content;
+
+    padding: 5px 10px;
+
+    border-radius: 999px;
+
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.request-detail-grid strong.nlp-category {
+    color: #245b7a;
+    font-weight: 600;
+}
+
+.request-detail-grid strong.nlp-badge.priority-low {
+    background-color: #e1f3ec;
+    color: #236b55;
+}
+
+.request-detail-grid strong.nlp-badge.priority-medium {
+    background-color: #fff4d6;
+    color: #946200;
+}
+
+.request-detail-grid strong.nlp-badge.priority-high {
+    background-color: #f9dada;
+    color: #9b2c2c;
+}
+
 /* Responsive modal */
 
 @media (max-width: 768px) {
-
     .request-modal {
         padding: 12px;
     }
@@ -613,7 +680,6 @@
 /* Responsive layout */
 
 @media (max-width: 768px) {
-
     .dashboard-header {
         padding: 20px;
     }
@@ -642,7 +708,7 @@
         min-height: 0;
     }
 
-        .request-section-header {
+    .request-section-header {
         flex-direction: column;
         align-items: stretch;
     }
@@ -655,5 +721,268 @@
         flex: 1;
         width: auto;
         min-width: 0;
+    }
+}
+
+/* =========================================================
+   Application Request Form
+   ========================================================= */
+
+.application-form-page {
+    margin: 0;
+    min-height: 100vh;
+    background: #f5f7fa;
+    color: #16324f;
+    font-family: Arial, sans-serif;
+}
+
+/* Header */
+
+.application-form-header {
+    background: #16324f;
+    color: #ffffff;
+    padding: 32px 40px;
+}
+
+.application-form-header > div {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.application-form-brand {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    opacity: 0.8;
+}
+
+.application-form-header h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.application-form-header p {
+    margin: 8px 0 0;
+    color: #dbe5ec;
+}
+
+/* Main content */
+
+.application-form-content {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 24px;
+}
+
+/* Form card */
+
+.application-form-card {
+    background: #ffffff;
+    border: 1px solid #dfe5eb;
+    border-radius: 10px;
+    padding: 32px;
+    box-shadow: 0 4px 14px rgba(22, 50, 79, 0.08);
+}
+
+/* Sections */
+
+.application-form-section {
+    margin-bottom: 24px;
+}
+
+.application-form-section:not(:first-child) {
+    margin-top: 36px;
+    padding-top: 28px;
+    border-top: 1px solid #e3e8ed;
+}
+
+.application-form-section h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #16324f;
+}
+
+/* Grid */
+
+.application-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 24px;
+}
+
+.application-form-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.application-form-field-full {
+    grid-column: 1 / -1;
+}
+
+/* Labels */
+
+.application-form-field label {
+    margin-bottom: 7px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #16324f;
+}
+
+/* Inputs */
+
+.application-form-field input,
+.application-form-field select,
+.application-form-field textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 12px;
+    border: 1px solid #cbd5df;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #263746;
+    font: inherit;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.application-form-field input,
+.application-form-field select {
+    min-height: 44px;
+}
+
+.application-form-field textarea {
+    min-height: 130px;
+    resize: vertical;
+}
+
+/* Focus */
+
+.application-form-field input:focus,
+.application-form-field select:focus,
+.application-form-field textarea:focus {
+    outline: none;
+    border-color: #245b7a;
+    box-shadow: 0 0 0 3px rgba(36, 91, 122, 0.12);
+}
+
+/* Validation */
+
+.application-form-field input[aria-invalid="true"],
+.application-form-field select[aria-invalid="true"],
+.application-form-field textarea[aria-invalid="true"] {
+    border-color: #b42318;
+}
+
+.application-form-error {
+    margin: 6px 0 0;
+    font-size: 0.82rem;
+    color: #b42318;
+}
+
+/* Form actions */
+
+.application-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 30px;
+    padding-top: 24px;
+    border-top: 1px solid #e3e8ed;
+}
+
+.application-form-actions .btn {
+    border: 0;
+    border-radius: 6px;
+    padding: 11px 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.application-form-actions .btn-primary {
+    background: #245b7a;
+    color: #ffffff;
+}
+
+.application-form-actions .btn-primary:hover {
+    background: #16324f;
+}
+
+/* Success and error messages */
+
+.application-form-message {
+    max-width: 1100px;
+    margin: 24px auto 0;
+    padding: 18px 24px;
+    border-radius: 8px;
+}
+
+.application-form-message h2 {
+    margin: 0 0 6px;
+    font-size: 1rem;
+}
+
+.application-form-message p {
+    margin: 0;
+}
+
+.application-form-success {
+    background: #eaf6ee;
+    border: 1px solid #b7dec2;
+    color: #205c35;
+}
+
+.application-form-errors {
+    background: #fff2f0;
+    border: 1px solid #f0c3bd;
+    color: #8f2118;
+}
+
+.application-form-errors ul {
+    margin: 10px 0 0;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+    .application-form-header {
+        padding: 26px 20px;
+    }
+
+    .application-form-header h1 {
+        font-size: 1.6rem;
+    }
+
+    .application-form-content {
+        margin: 24px auto;
+        padding: 0 16px;
+    }
+
+    .application-form-card {
+        padding: 22px;
+    }
+
+    .application-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .application-form-field-full {
+        grid-column: auto;
+    }
+
+    .application-form-actions {
+        justify-content: stretch;
+    }
+
+    .application-form-actions .btn {
+        width: 100%;
+    }
+
+    .application-form-message {
+        margin-left: 16px;
+        margin-right: 16px;
     }
 }

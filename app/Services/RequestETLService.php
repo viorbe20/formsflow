@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\ApplicationRequest;
 use App\Models\ProcessedRequest;
-use App\Services\RequestNLPClassifier;
 use Illuminate\Support\LazyCollection;
 
 class RequestETLService
@@ -24,8 +23,7 @@ class RequestETLService
     public function transform(
         ApplicationRequest $request,
         RequestNLPClassifier $classifier
-    ): array
-    {
+    ): array {
         $normalizedText = implode(' ', [
             $request->subject,
             $request->statement,

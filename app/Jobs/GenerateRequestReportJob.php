@@ -2,10 +2,10 @@
 
 namespace App\Jobs;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
 use App\Models\ProcessedRequest;
 use App\Models\RequestReport;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
 
 class GenerateRequestReportJob implements ShouldQueue
 {
@@ -31,7 +31,7 @@ class GenerateRequestReportJob implements ShouldQueue
             ->selectRaw('COUNT(*) as total')
             ->groupBy('organization')
             ->get();
-        
+
         $requestsByStatus = ProcessedRequest::query()
             ->select('status')
             ->selectRaw('COUNT(*) as total')
@@ -44,10 +44,9 @@ class GenerateRequestReportJob implements ShouldQueue
             'by_status' => $requestsByStatus,
         ];
 
-
         // Create a new report and save it in the request_reports table.
         RequestReport::create([
-            
+
             // Store the date and time when the report is generated.
             'generated_at' => now(),
 
