@@ -31,40 +31,70 @@ El proyecto está planteado como un demostrador técnico de desarrollo de soluci
 - [Descripción](#descripción)
 - [Objetivos](#objetivos)
 - [Caso de uso](#caso-de-uso)
-  - [Flujo funcional](#flujo-funcional)
-- [Funcionalidades](#funcionalidades)
 - [Modelo de datos](#modelo-de-datos)
   - [Datos principales de una solicitud](#datos-principales-de-una-solicitud)
   - [Tipos de solicitudes](#tipos-de-solicitudes)
 - [Arquitectura](#arquitectura)
 - [Stack tecnológico](#stack-tecnológico)
-- [Flujo de datos](#flujo-de-datos)
+  - [Backend](#backend)
+  - [Frontend](#frontend)
+  - [Base de datos](#base-de-datos)
+  - [API](#api)
+  - [Procesamiento de datos](#procesamiento-de-datos)
+  - [NPL](#nlp)
+  - [Pruebas](#pruebas)
+  - [Contenedores y desarrollo](#contenedores-y-desarrollo)
 - [API REST](#api-rest)
   - [Endpoints](#endpoints)
   - [Listar solicitudes](#listar-solicitudes)
   - [Crear una solicitud](#crear-una-solicitud)
-  - [Consultar una solicitud](#consultar-una-solicitud)
+  - [Obtener una solicitud](#obtener-una-solicitud)
   - [Archivar una solicitud](#archivar-una-solicitud)
   - [Validación](#validación)
   - [Códigos HTTP utilizados](#códigos-http-utilizados)
 - [ETL y procesamiento NLP](#etl-y-procesamiento-nlp)
+  - [Clasificación NLP](#clasificación-nlp)
   - [Funcionamiento](#funcionamiento)
 - [Automatización](#automatización)
 - [Dashboard y explotación del dato](#dashboard-y-explotación-del-dato)
+  - [Paginación](#paginación)
+  - [Búsqueda](#búsqueda)
+  - [Estadísticas por organización](#estadísticas-por-organización)
+  - [Estados de las solicitudes](#estados-de-las-solicitudes)
+  - [Consulta del detalle](#consulta-del-detalle)
+  - [Clasificación y explotación](#clasificación-y-explotación)
 - [Testing](#testing)
-  - [Resultado actual](#resultado-actual)
   - [Pruebas del clasificador NLP](#pruebas-del-clasificador-nlp)
-- [Docker](#docker)
+  - [Pruebas de la API](#pruebas-de-la-api)
 - [Instalación](#instalación)
   - [Requisitos](#requisitos)
   - [Ejecutar el proyecto](#ejecutar-el-proyecto)
+  - [Datos de demostración](#datos-de-demostración)
+  - [Generación de recursos frontend](#generación-de-recursos-frontend)
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Decisiones técnicas](#decisiones-técnicas)
+  - [Laravel como framework principal](#laravel-como-framework-principal)
+  - [Separación entre solicitudes recibidas y solicitudes procesadas](#separación-entre-solicitudes-recibidas-y-solicitudes-procesadas)
+  - [Servicio independiente para el ETL](#servicio-independiente-para-el-etl)
+  - [Servicio independiente para el NLP](#servicio-independiente-para-el-nlp)
+  - [NLP basado en reglas](#nlp-basado-en-reglas)
+  - [Docker desde el inicio](#docker-desde-el-inicio)
+  - [Datos de demostración](#datos-de-demostración)
+  - [Alcance controlado](#alcance-controlado)
 - [Mejoras futuras](#mejoras-futuras)
+  - [Historial avanzado de solicitudes](#historial-avanzado-de-solicitudes)
+  - [Autenticación y autorización](#autenticación-y-autorización)
+  - [Exportación de información](#exportación-de-información)
+  - [NLP avanzado](#nlp-avanzado)
+  - [Dashboard avanzado](#dashboard-avanzado)
+  - [Automatización avanzada](#automatización-avanzada)
 - [Documentación](#documentación)
+- [Despliegue](#despliegue)
+  - [Entorno de demostración](#entorno-de-demostración)
+  - [Acceso a la demo](#acceso-a-la-demo)
 - [Enlaces](#enlaces)
 - [Licencia](#licencia)
-
+- [Docker](#docker)
 ---
 ## Descripción
 
@@ -87,7 +117,7 @@ FormsFlow utiliza un caso de uso ficticio inspirado en los procesos habituales d
 El **objetivo** no es construir una plataforma administrativa completa, sino desarrollar una pequeña aplicación que permita mostrar de forma integrada diferentes competencias de desarrollo, integración, tratamiento de datos y automatización.
 
 ---
-
+[ÍNDICE](#índice)
 ## Objetivos
 
 El objetivo principal de FormsFlow es demostrar el desarrollo de una solución digital completa que cubra el ciclo básico de una solicitud:
@@ -111,7 +141,7 @@ Automatización
 ```
 
 ---
-
+[ÍNDICE](#índice)
 ## Caso de uso
 
 FormsFlow **simula una plataforma de gestión de solicitudes** dirigidas a diferentes organismos y unidades administrativas.
@@ -129,7 +159,7 @@ Los **datos procesados** se utilizan posteriormente para generar informes estad�
 El proyecto utiliza exclusivamente datos ficticios de demostración y no pretende reproducir un procedimiento administrativo real.
 
 ---
-
+[ÍNDICE](#índice)
 ## Modelo de datos
 
 FormsFlow utiliza un **modelo relacional** para separar las solicitudes recibidas de los registros generados durante su procesamiento.
@@ -195,7 +225,7 @@ La prioridad se clasifica en tres niveles:
 La clasificación se realiza mediante un sistema de reglas y términos ponderados implementado en el servicio `RequestNLPClassifier`.
 
 ---
-
+[ÍNDICE](#índice)
 ## Arquitectura
 
 FormsFlow sigue una **arquitectura basada en Laravel** en la que los diferentes componentes de la aplicación se organizan según su responsabilidad.
@@ -265,7 +295,7 @@ El procesamiento ETL se encapsula en `RequestETLService`, mientras que la clasif
 Esta separación permite mantener aislada la lógica de negocio y facilita su prueba mediante tests unitarios y de integración.
 
 ---
-
+[ÍNDICE](#índice)
 ## Stack tecnológico
 
 ### Backend
@@ -320,9 +350,9 @@ Load
 
 Durante la transformación se normaliza la información y se aplica el clasificador NLP.
 
-### PLN
+### NLP
 
-El componente de PLN está implementado actualmente como un servicio PHP:
+El componente de NLP está implementado actualmente como un servicio PHP:
 
 ```text
 App\Services\RequestNLPClassifier
@@ -332,7 +362,7 @@ El sistema **normaliza el texto** y utiliza términos ponderados para determinar
 
 No se utiliza actualmente un modelo de aprendizaje automático entrenado. El enfoque se ha elegido por su sencillez, trazabilidad y adecuación al alcance del proyecto demostrador.
 
-### Testing
+### Pruebas
 
 El proyecto utiliza:
 
@@ -347,8 +377,6 @@ Actualmente la suite contiene:
 48 assertions
 ```
 
----
-
 ### Contenedores y desarrollo
 
 El entorno de desarrollo utiliza:
@@ -362,7 +390,130 @@ El entorno de desarrollo utiliza:
 El objetivo de Docker es proporcionar un entorno reproducible para ejecutar la aplicación y sus servicios asociados.
 
 ---
+[ÍNDICE](#índice)
+## API REST
 
+FormsFlow dispone de una API REST desarrollada con Laravel que **permite consultar, crear y gestionar solicitudes** de forma programática.
+
+La API proporciona una interfaz de integración independiente de la interfaz web, permitiendo que otros sistemas o clientes puedan interactuar con las solicitudes mediante peticiones HTTP y respuestas en formato JSON.
+
+### Endpoints
+
+La API implementa actualmente cuatro operaciones principales:
+
+| Método | Endpoint | Descripción | Respuesta |
+|---|---|---|---|
+| `GET` | `/api/requests` | **Obtiene un listado** resumido de solicitudes | `200 OK` |
+| `POST` | `/api/requests` | Crea una **nueva solicitud** | `200 OK` |
+| `GET` | `/api/requests/{reference_code}` | **Obtiene una solicitud** mediante su código de referencia | `200 OK` |
+| `PATCH` | `/api/requests/{reference_code}/archive` | **Archiva** una solicitud | `200 OK` |
+
+Los endpoints fueron comprobados mediante `php artisan route:list --path=api` y posteriormente probados mediante peticiones HTTP utilizando `curl`. Las cuatro rutas quedaron registradas y operativas. 
+
+### Listar solicitudes
+
+```http
+GET /api/requests
+Accept: application/json
+```
+
+Este endpoint devuelve un listado resumido de las solicitudes almacenadas.
+
+La respuesta utiliza la propiedad `data` y contiene información resumida de cada solicitud, como el código de referencia, organismo, unidad, asunto, estado, categoría, prioridad y fecha de creación.
+
+Los campos `category` y `priority` aparecen actualmente con valor `null` en las solicitudes mostradas porque estos datos se generan posteriormente durante el procesamiento de las solicitudes mediante el pipeline ETL y el componente de clasificación PLN. Por tanto, una solicitud recién registrada puede no disponer todavía de ``categoría`` o ``prioridad`` asignada.
+
+No se incluyen los datos personales ni el contenido completo de la solicitud, evitando exponer información innecesaria en una operación de listado.
+
+La operación fue probada mediante una petición HTTP realizada desde el navegador, verificando la respuesta JSON generada por la API.
+
+![Prueba del endpoint para listar solicitudes](docs/images/api_list_requests.png)
+
+### Crear una solicitud
+
+```http
+POST /api/requests
+Content-Type: application/json
+Accept: application/json
+```
+
+El endpoint permite crear una nueva solicitud mediante una petición JSON.
+
+Ejemplo:
+
+```json
+{
+    "name": "Carlos López",
+    "email": "carlos.lopez@example.com",
+    "phone": "600987654",
+    "organization": "Educación",
+    "unit": "Dirección General de Innovación y Formación del Profesorado",
+    "subject": "Problema con un servicio",
+    "statement": "No puedo acceder correctamente al servicio.",
+    "request_text": "Solicito que se revise el problema."
+}
+```
+
+La aplicación genera automáticamente el `reference_code`, establece inicialmente el estado `pending` y registra la fecha de creación.
+
+La respuesta devuelve un mensaje de confirmación junto con los datos principales de la solicitud creada, sin incluir nuevamente los datos personales ni el contenido completo.
+
+### Obtener una solicitud
+
+```http
+GET /api/requests/{reference_code}
+Accept: application/json
+```
+
+Este endpoint permite recuperar una solicitud concreta utilizando su código de referencia.
+
+A diferencia del listado general, la respuesta contiene la información completa de la solicitud, incluyendo los datos de contacto, el contenido (`statement` y `request_text`), el estado, la categoría, la prioridad y las fechas de creación y actualización.
+
+Ejemplo:
+
+```http
+GET /api/requests/FF-2026-000010
+```
+
+![Prueba del endpoint para listar solicitudes](docs/images/api_get_request.png)
+
+### Archivar una solicitud
+
+```http
+PATCH /api/requests/{reference_code}/archive
+Accept: application/json
+```
+
+Este endpoint permite cambiar el estado de una solicitud a `archived`.
+
+Ejemplo:
+
+```http
+PATCH /api/requests/FF-2026-000010/archive
+```
+
+La operación devuelve un mensaje de confirmación y el código de referencia de la solicitud. Durante las pruebas se comprobó que una solicitud con estado `pending` pasa correctamente a estado `archived`.
+
+### Validación
+
+Las operaciones que reciben datos utilizan **validación de las entradas** antes de realizar modificaciones en la base de datos.
+
+De esta forma se evita almacenar solicitudes con datos incompletos o con formatos no válidos y se mantiene una separación clara entre la recepción de datos, su validación y su persistencia.
+
+### Códigos HTTP utilizados
+
+La API utiliza códigos HTTP para comunicar el resultado de las operaciones.
+
+| Código                     | Significado                       | Uso                             |
+| -------------------------- | --------------------------------- | ------------------------------- |
+| `200 OK`                   | Operación realizada correctamente | Consultas, creación y archivado |
+| `404 Not Found`            | Recurso no encontrado             | Solicitud inexistente           |
+| `422 Unprocessable Entity` | Datos no válidos                  | Errores de validación           |
+
+Las pruebas realizadas mediante `curl` confirmaron el funcionamiento de los cuatro endpoints principales y la coherencia de sus respuestas JSON.
+
+---
+[ÍNDICE](#índice)
 ## ETL y procesamiento NLP
 
 FormsFlow incorpora un **pipeline ETL** para transformar las solicitudes almacenadas en la aplicación en registros preparados para su explotación.
@@ -503,7 +654,7 @@ El sistema utiliza reglas explícitas y trazables, por lo que el resultado puede
 **No se utiliza actualmente un modelo de aprendizaje automático entrenado**. El enfoque basado en reglas se ha elegido para mantener el componente NLP pequeño, determinista y fácilmente verificable dentro del alcance del proyecto.
 
 ---
-
+[ÍNDICE](#índice)
 ## Automatización
 
 FormsFlow utiliza **mecanismos de automatización** proporcionados por Laravel para **ejecutar procesos** de forma programada y desacoplar determinadas tareas del flujo principal de la aplicación.
@@ -534,7 +685,7 @@ La arquitectura permite ejecutar este proceso manualmente durante el desarrollo 
 La **automatización** se mantiene **separada de la lógica de transformación**, de manera que el comando Artisan actúa como punto de entrada del proceso y `RequestETLService` contiene la lógica principal.
 
 ---
-
+[ÍNDICE](#índice)
 ## Dashboard y explotación del dato
 
 El Dashboard proporciona una interfaz para consultar y explotar la información almacenada en `processed_requests`.
@@ -693,6 +844,8 @@ informacion           baja              6
 
 De esta forma, el resultado del procesamiento automático **puede utilizarse posteriormente para generar indicadores** y facilitar la consulta de la información.
 
+---
+[ÍNDICE](#índice)
 ## Testing
 
 FormsFlow **incorpora pruebas automatizadas** para validar tanto la lógica de clasificación como diferentes operaciones de la API y del procesamiento ETL.
@@ -770,7 +923,7 @@ Esto permite comprobar el funcionamiento de las diferentes capas principales de 
 ![Ejecución de las pruebas API REST](docs/images/tests_api.png)
 
 ---
-
+[ÍNDICE](#índice)
 ## Docker
 
 FormsFlow utiliza Docker para proporcionar un entorno de desarrollo reproducible.
@@ -887,6 +1040,9 @@ npm run build
 
 La aplicación puede iniciarse entonces utilizando el entorno configurado mediante Docker Compose.
 
+---
+
+[ÍNDICE](#índice)
 ### Datos de demostración
 
 El proyecto incluye un **Seeder** específico para **generar datos ficticios de demostración**:
@@ -932,51 +1088,6 @@ El build actual de Vite genera correctamente los archivos de producción en:
 ```text
 public/build/
 ```
-
----
-## Despliegue
-
-FormsFlow está preparado para ejecutarse mediante contenedores Docker y se plantea su despliegue público utilizando una arquitectura separada para la aplicación y la base de datos.
-
-La aplicación Laravel se desplegará mediante Docker en **Koyeb**, mientras que la base de datos PostgreSQL se alojará en **Supabase**.
-
-La arquitectura de despliegue será:
-
-```text
-                         GitHub
-                            │
-                            │ Deploy
-                            ▼
-                    ┌───────────────┐
-                    │     Koyeb     │
-                    │               │
-                    │    Laravel    │
-                    │    Docker     │
-                    └───────┬───────┘
-                            │
-                            │ PostgreSQL
-                            ▼
-                    ┌───────────────┐
-                    │   Supabase    │
-                    │               │
-                    │  PostgreSQL   │
-                    └───────────────┘
-```
-
-### Entorno de demostración
-
-El objetivo del despliegue es proporcionar una **demo pública de FormsFlow** que permita comprobar directamente el funcionamiento de la aplicación sin necesidad de instalar el proyecto localmente.
-
-Supabase proporciona una base de datos PostgreSQL gestionada dentro de su plan gratuito, suficiente para el volumen reducido de datos utilizado por la demo.
-
-La configuración definitiva del despliegue, las variables de entorno y los pasos de publicación se documentarán una vez completado y validado el despliegue.
-
-### Acceso a la demo
-
-**Demo pública:** pendiente de despliegue.
-
-**Repositorio:** pendiente de añadir la URL definitiva de GitHub.
-
 ---
 [ÍNDICE](#índice)
 ## Estructura del proyecto
@@ -1042,7 +1153,8 @@ Las principales responsabilidades son:
 | `tests/Feature`        | Pruebas funcionales                 |
 | `tests/Unit`           | Pruebas unitarias                   |
 
-
+--- 
+[ÍNDICE](#índice)
 ## Decisiones técnicas
 
 ### Laravel como framework principal
@@ -1168,7 +1280,7 @@ Testing
 Las funcionalidades que requieren una inversión significativa de tiempo y que no son necesarias para demostrar estos objetivos se mantienen como posibles mejoras futuras.
 
 ---
-
+[ÍNDICE](#índice)
 ## Mejoras futuras
 
 El proyecto se ha diseñado para poder ampliarse progresivamente. Las siguientes funcionalidades quedan fuera del alcance actual, pero podrían incorporarse en futuras iteraciones.
@@ -1236,7 +1348,7 @@ El pipeline ETL puede integrarse con una planificación periódica mediante Lara
 También podría incorporarse un sistema de notificaciones para determinadas solicitudes de alta prioridad.
 
 ---
-
+[ÍNDICE](#índice)
 ## Documentación
 
 La documentación del proyecto se encuentra principalmente en este README.
@@ -1259,7 +1371,55 @@ La documentación se organiza alrededor de:
 El objetivo es que una persona técnica pueda comprender la arquitectura y ejecutar el proyecto sin depender de explicaciones externas.
 
 ---
+[ÍNDICE](#índice)
+## Despliegue
 
+FormsFlow está preparado para ejecutarse mediante contenedores Docker y se plantea su despliegue público utilizando una arquitectura separada para la aplicación y la base de datos.
+
+La aplicación Laravel se desplegará mediante Docker en **Koyeb**, mientras que la base de datos PostgreSQL se alojará en **Supabase**.
+
+La arquitectura de despliegue será:
+
+```text
+                         GitHub
+                            │
+                            │ Deploy
+                            ▼
+                    ┌───────────────┐
+                    │     Koyeb     │
+                    │               │
+                    │    Laravel    │
+                    │    Docker     │
+                    └───────┬───────┘
+                            │
+                            │ PostgreSQL
+                            ▼
+                    ┌───────────────┐
+                    │   Supabase    │
+                    │               │
+                    │  PostgreSQL   │
+                    └───────────────┘
+```
+---
+[ÍNDICE](#índice)
+### Entorno de demostración
+
+El objetivo del despliegue es proporcionar una **demo pública de FormsFlow** que permita comprobar directamente el funcionamiento de la aplicación sin necesidad de instalar el proyecto localmente.
+
+Supabase proporciona una base de datos PostgreSQL gestionada dentro de su plan gratuito, suficiente para el volumen reducido de datos utilizado por la demo.
+
+La configuración definitiva del despliegue, las variables de entorno y los pasos de publicación se documentarán una vez completado y validado el despliegue.
+
+---
+[ÍNDICE](#índice)
+### Acceso a la demo
+
+**Demo pública:** pendiente de despliegue.
+
+**Repositorio:** pendiente de añadir la URL definitiva de GitHub.
+
+---
+[ÍNDICE](#índice)
 ## Enlaces
 
 ### Repositorio
@@ -1273,6 +1433,13 @@ El objetivo es que una persona técnica pueda comprender la arquitectura y ejecu
 Una vez desplegada la aplicación, ambas direcciones se incorporarán a esta sección y podrán utilizarse directamente desde el CV.
 
 ---
-
+[ÍNDICE](#índice)
 ## Licencia
+
+
+
+
+
+
+
 
