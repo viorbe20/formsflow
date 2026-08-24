@@ -71,6 +71,13 @@ RUN composer install \
 # Copy the Laravel application source code.
 COPY . .
 
+# Create Laravel runtime directories required for compiled views and cache.
+RUN mkdir -p \
+    storage/framework/cache \
+    storage/framework/sessions \
+    storage/framework/views \
+    bootstrap/cache
+
 # Run Laravel package discovery after the application files,
 # including artisan, have been copied into the image.
 RUN php artisan package:discover --ansi
