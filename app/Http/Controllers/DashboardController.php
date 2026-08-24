@@ -42,6 +42,10 @@ class DashboardController extends Controller
         // These statistics are independent from pagination and reference search.
         $totalRequests = ProcessedRequest::count();
 
+        $pendingRequests = ProcessedRequest::where('status', 'pending')->count();
+
+        $archivedRequests = ProcessedRequest::where('status', 'archived')->count();
+
         $requestsByOrganization = ProcessedRequest::query()
             ->selectRaw('organization, COUNT(*) as total')
             ->groupBy('organization')
@@ -59,6 +63,8 @@ class DashboardController extends Controller
             'latestReport' => $latestReport,
             'recentRequests' => $recentRequests,
             'totalRequests' => $totalRequests,
+            'pendingRequests' => $pendingRequests,
+            'archivedRequests' => $archivedRequests,
             'requestsByOrganization' => $requestsByOrganization,
         ]);
     }

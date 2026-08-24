@@ -28,7 +28,7 @@
                 <h1>Dashboard</h1>
             </div>
 
-            <a href="#" class="btn btn-primary">
+            <a href="{{ route('application-requests.create') }}" class="btn btn-primary">
                 + Nueva solicitud
             </a>
 
@@ -48,7 +48,7 @@
                     </span>
 
                     <strong class="stat-value">
-                        {{ $latestReport?->total_requests ?? 0 }}
+                        {{ $totalRequests }}
                     </strong>
 
                 </article>
@@ -61,7 +61,7 @@
                     </span>
 
                     <strong class="stat-value">
-                        {{ $latestReport?->by_status['pending'] ?? 0 }}
+                        {{ $pendingRequests }}
                     </strong>
 
                 </article>
@@ -74,7 +74,7 @@
                     </span>
 
                     <strong class="stat-value">
-                        {{ $latestReport?->by_status['archived'] ?? 0 }}
+                        {{ $archivedRequests }}
                     </strong>
 
                 </article>
@@ -147,7 +147,7 @@
 
                 <div class="section-header request-section-header">
 
-                    <h2>Úlltimas solicitudes</h2>
+                    <h2>Últimas solicitudes</h2>
 
                         <form
                             method="GET"

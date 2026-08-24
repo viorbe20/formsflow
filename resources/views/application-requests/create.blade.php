@@ -15,6 +15,7 @@
 <body class="application-form-page">
 
     <header class="application-form-header">
+
         <div>
             <span class="application-form-brand">FORMSFLOW</span>
 
@@ -22,6 +23,11 @@
 
             <p>Registro de una nueva solicitud</p>
         </div>
+
+        <a href="{{ route('dashboard') }}" class="btn btn-primary">
+            Dashboard
+        </a>
+
     </header>
 
     @if (session('success'))

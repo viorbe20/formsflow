@@ -1,6 +1,7 @@
 *.log
 .DS_Store
 .env
+.env.local.backup
 .env.backup
 .env.production
 .phpactor.json
@@ -24,3 +25,4 @@ Homestead.yaml
 Thumbs.db
 # Seguimiento personal del desarrollo
 timeline.md
+Dockerfile.dev.backup

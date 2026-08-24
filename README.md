@@ -27,35 +27,18 @@ El proyecto está planteado como un demostrador técnico de desarrollo de soluci
 ---
 
 ## Índice
+
 - [Descripción](#descripción)
 - [Objetivos](#objetivos)
-- [Arquitectura](#arquitectura)
-- [Funcionalidades](#funcionalidades)
-- [Flujo de datos](#flujo-de-datos)
-- [API REST](#api-rest)
-- [ETL y procesamiento NLP](#etl-y-procesamiento-nlp)
-- [Automatización](#automatización)
-- [Testing](#testing)
-- [Docker](#docker)
-- [Instalación](#instalación)
-- [Estructura del proyecto](#estructura-del-proyecto)
-- [Decisiones técnicas](#decisiones-técnicas)
-- [Mejoras futuras](#mejoras-futuras)
-- [Descripción](#descripción)
-
-- [Objetivo](#objetivo)
-
 - [Caso de uso](#caso-de-uso)
   - [Flujo funcional](#flujo-funcional)
 - [Funcionalidades](#funcionalidades)
 - [Modelo de datos](#modelo-de-datos)
   - [Datos principales de una solicitud](#datos-principales-de-una-solicitud)
   - [Tipos de solicitudes](#tipos-de-solicitudes)
-
 - [Arquitectura](#arquitectura)
-
 - [Stack tecnológico](#stack-tecnológico)
-
+- [Flujo de datos](#flujo-de-datos)
 - [API REST](#api-rest)
   - [Endpoints](#endpoints)
   - [Listar solicitudes](#listar-solicitudes)
@@ -64,559 +47,793 @@ El proyecto está planteado como un demostrador técnico de desarrollo de soluci
   - [Archivar una solicitud](#archivar-una-solicitud)
   - [Validación](#validación)
   - [Códigos HTTP utilizados](#códigos-http-utilizados)
-
 - [ETL y procesamiento NLP](#etl-y-procesamiento-nlp)
   - [Funcionamiento](#funcionamiento)
-
+- [Automatización](#automatización)
+- [Dashboard y explotación del dato](#dashboard-y-explotación-del-dato)
 - [Testing](#testing)
   - [Resultado actual](#resultado-actual)
-
+  - [Pruebas del clasificador NLP](#pruebas-del-clasificador-nlp)
+- [Docker](#docker)
 - [Instalación](#instalación)
   - [Requisitos](#requisitos)
   - [Ejecutar el proyecto](#ejecutar-el-proyecto)
-
-- [Pruebas del clasificador NLP]
-
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Decisiones técnicas](#decisiones-técnicas)
 - [Mejoras futuras](#mejoras-futuras)
-
 - [Documentación](#documentación)
-
 - [Enlaces](#enlaces)
-
 - [Licencia](#licencia)
 
 ---
+## Descripción
 
-## Objetivo
+FormsFlow es una **aplicación web full-stack** desarrollada con Laravel que reproduce, a pequeña escala, un **flujo de gestión digital de solicitudes**.
 
-**Construir una aplicación web completa que simule el ciclo de gestión de una solicitud administrativa digital**, desde su presentación mediante formulario hasta su almacenamiento, procesamiento, clasificación y explotación del dato.
+El proyecto integra en una misma aplicación diferentes capacidades relacionadas con el desarrollo de soluciones digitales:
 
-El proyecto permite demostrar progresivamente:
+- Formularios digitales y validación de datos.
+- Persistencia en una base de datos relacional.
+- API REST para la integración con otros sistemas.
+- Procesamiento ETL de la información.
+- Clasificación automática mediante técnicas sencillas de PLN.
+- Automatización de procesos mediante Jobs y Laravel Scheduler.
+- Explotación del dato mediante informes y un Dashboard.
+- Testing automatizado.
+- Contenerización mediante Docker.
 
-* Desarrollo de aplicaciones web con Laravel.
-* Diseño y gestión de bases de datos relacionales.
-* Desarrollo y consumo de APIs REST.
-* Diseño de formularios digitales y validación de datos.
-* Procesos ETL.
-* Automatización de tareas.
-* Explotación y visualización de datos.
-* Aplicación de técnicas de PLN para clasificación.
-* Testing.
-* Contenerización con Docker.
-* Integración continua.
-* Documentación técnica.
+FormsFlow utiliza un caso de uso ficticio inspirado en los procesos habituales de gestión de solicitudes administrativas electrónicas. No utiliza datos personales reales ni tramita solicitudes reales.
 
-La inteligencia artificial/PLN será un **componente auxiliar del sistema**, no el objetivo principal de la aplicación.
+El **objetivo** no es construir una plataforma administrativa completa, sino desarrollar una pequeña aplicación que permita mostrar de forma integrada diferentes competencias de desarrollo, integración, tratamiento de datos y automatización.
+
+---
+
+## Objetivos
+
+El objetivo principal de FormsFlow es demostrar el desarrollo de una solución digital completa que cubra el ciclo básico de una solicitud:
+
+```text
+Formulario
+    ↓
+Validación
+    ↓
+Persistencia
+    ↓
+API REST
+    ↓
+ETL
+    ↓
+Clasificación NLP
+    ↓
+Explotación del dato
+    ↓
+Automatización
+```
 
 ---
 
 ## Caso de uso
 
-FormsFlow simula una plataforma de gestión de solicitudes dirigidas a un organismo público.
+FormsFlow **simula una plataforma de gestión de solicitudes** dirigidas a diferentes organismos y unidades administrativas.
 
-El ciudadano puede presentar una solicitud mediante un formulario digital, indicando sus datos de contacto, el organismo destinatario, el asunto, una descripción de la situación (`Expone`) y la actuación que solicita (`Solicita`).
+El **usuario puede presentar una solicitud mediante un formulario digital** indicando sus datos de contacto, el organismo y unidad destinataria, el asunto, la exposición de la situación y la actuación solicitada. Una vez registrada, la solicitud queda almacenada en la base de datos y puede ser gestionada mediante la aplicación y su API REST.
 
-La aplicación registra y gestiona estas solicitudes y, posteriormente, permitirá procesar los datos mediante procesos ETL y aplicar un componente de PLN para clasificar automáticamente las solicitudes y establecer una prioridad orientativa.
+![Formulario](docs/images/form_1.png)
 
-El proyecto utiliza un **caso de uso ficticio**, inspirado en los patrones habituales de los formularios administrativos electrónicos, sin utilizar datos personales reales ni tramitar solicitudes reales.
+Posteriormente, el **pipeline ETL extrae las solicitudes** almacenadas, **transforma y normaliza** su información y genera registros preparados para su explotación. 
 
-### Flujo funcional
+Durante este procesamiento se aplica un **componente de PLN** basado en reglas y palabras clave ponderadas. En función del contenido de la solicitud, el clasificador asigna una ``categoría`` y una ``prioridad`` orientativa a cada de ellas. 
 
-```mermaid
-flowchart TD
-    A[Formulario ciudadano] --> B[Registro de solicitud]
-    B --> C[Validación]
-    C[PostgreSQL]
-    C --> E[ETL]
-    E --> F[Clasificación NLP]
-    F --> G[Prioridad y categoría]
-    G --> H[Explotación del dato]
-    H --> I[Automatización]
+Los **datos procesados** se utilizan posteriormente para generar informes estadísticos y alimentar el **Dashboard** de FormsFlow.
 
-    classDef app fill:#e8f5e9,stroke:#388e3c,stroke-width:1px
-    classDef data fill:#e3f2fd,stroke:#1976d2,stroke-width:1px
-    classDef ai fill:#fff3e0,stroke:#f57c00,stroke-width:1px
+El proyecto utiliza exclusivamente datos ficticios de demostración y no pretende reproducir un procedimiento administrativo real.
 
-    class A,B,C app
-    class D,E,H,I data
-    class F,G ai
-```
+---
 
 ## Modelo de datos
 
-La entidad principal del sistema es `ApplicationRequest`, que representa una solicitud administrativa presentada mediante el formulario digital.
+FormsFlow utiliza un **modelo relacional** para separar las solicitudes recibidas de los registros generados durante su procesamiento.
 
-La solicitud contiene:
+La información principal se organiza alrededor de dos entidades:
 
-* Datos del solicitante.
-* Organismo y unidad destinataria.
-* Asunto.
-* Exposición (`Expone`).
-* Petición (`Solicita`).
-* Estado de tramitación.
-* Categoría.
-* Prioridad.
+- `application_requests`: almacena las solicitudes originales recibidas por la aplicación.
+- `processed_requests`: almacena la información transformada y clasificada durante el proceso ETL.
 
-La categoría y la prioridad se incorporarán posteriormente mediante el procesamiento automático del sistema.
+Esta separación permite diferenciar entre los **datos de entrada** y los **datos preparados** para su explotación.
 
 ### Datos principales de una solicitud
 
-```text
-ApplicationRequest
-├── Datos del solicitante
+Una solicitud contiene información relacionada con:
+
+
+Solicitud
+│
+├── Identificación
+│   └── Referencia
+│
+├── Persona solicitante
+│   ├── Nombre
+│   └── Datos de contacto
+│
 ├── Destino
-├── Asunto
-├── Expone
-├── Solicita
-├── Estado
-├── Categoría
-└── Prioridad
-```
+│   ├── Organización
+│   └── Unidad
+│
+├── Contenido
+│   ├── Asunto
+│   ├── Exposición
+│   └── Texto de la solicitud
+│
+├── Gestión
+│   └── Estado
+│
+├── Clasificación
+│   ├── Categoría
+│   └── Prioridad
+│
+└── Fechas
+    ├── Creación
+    └── Procesamiento
+
+
+Los datos de clasificación (`category` y `priority`) se generan durante el procesamiento y permiten utilizar posteriormente la información para consultas, estadísticas e informes.
 
 ### Tipos de solicitudes
 
-El sistema está preparado para trabajar posteriormente con diferentes categorías, como:
+El componente de PLN clasifica las solicitudes en tres categorías principales:
 
-* Información → consultas sobre servicios o procedimientos.
-* Incidencia → comunicación de un problema en un servicio.
-* Documentación → solicitudes relacionadas con documentos o certificados.
+- `informacion`: consultas o solicitudes de información.
+- `incidencia`: problemas o errores relacionados con un servicio o procedimiento.
+- `documentacion`: solicitudes relacionadas con documentos, certificados o justificantes.
+
+La prioridad se clasifica en tres niveles:
+
+- `baja`
+- `media`
+- `alta`
+
+La clasificación se realiza mediante un sistema de reglas y términos ponderados implementado en el servicio `RequestNLPClassifier`.
 
 ---
 
 ## Arquitectura
 
-La aplicación se desarrolla sobre una arquitectura basada en contenedores:
+FormsFlow sigue una **arquitectura basada en Laravel** en la que los diferentes componentes de la aplicación se organizan según su responsabilidad.
 
 ```text
-┌───────────────────────────────┐
-│          FormsFlow            │
-│                               │
-│  ┌─────────────────────────┐  │
-│  │       Laravel 12        │  │
-│  │        PHP 8.3          │  │
-│  └────────────┬────────────┘  │
-│               │               │
-│               ▼               │
-│  ┌─────────────────────────┐  │
-│  │      PostgreSQL 16      │  │
-│  └─────────────────────────┘  │
-│                               │
-└───────────────────────────────┘
+┌──────────────────────────────┐
+│          Usuario             │
+└──────────────┬───────────────┘
+               │
+               ▼
+┌──────────────────────────────┐
+│       Formularios / Blade     │
+└──────────────┬───────────────┘
+               │
+               ▼
+┌──────────────────────────────┐
+│        Controllers            │
+│   Web / API REST / Dashboard  │
+└──────────────┬───────────────┘
+               │
+               ▼
+┌──────────────────────────────┐
+│          Eloquent             │
+│      Modelos y ORM            │
+└──────────────┬───────────────┘
+               │
+               ▼
+┌──────────────────────────────┐
+│       Base de datos           │
+└──────────────────────────────┘
+
+               │
+               │ ETL
+               ▼
+
+┌──────────────────────────────┐
+│      RequestETLService        │
+│ Extract → Transform → Load    │
+└──────────────┬───────────────┘
+               │
+               ├───────────────► RequestNLPClassifier
+               │                       │
+               │                       ▼
+               │                 Categoría / Prioridad
+               │
+               ▼
+┌──────────────────────────────┐
+│      ProcessedRequest        │
+└──────────────┬───────────────┘
+               │
+               ├───────────────► Informes
+               │
+               └───────────────► Dashboard
 ```
 
-El componente de PLN se incorporará posteriormente como un servicio independiente.
+La aplicación utiliza Laravel como núcleo de la solución y separa las responsabilidades principales entre:
+
+- controladores
+- modelos
+- servicios
+- comandos Artisan
+- vistas
+- pruebas.
+
+El procesamiento ETL se encapsula en `RequestETLService`, mientras que la clasificación de las solicitudes se concentra en `RequestNLPClassifier`.
+
+Esta separación permite mantener aislada la lógica de negocio y facilita su prueba mediante tests unitarios y de integración.
 
 ---
 
 ## Stack tecnológico
 
-| Tecnología     | Uso                         |
-| -------------- | --------------------------- |
-| Laravel 12     | Backend y aplicación web    |
-| PHP 8.3        | Lenguaje de backend         |
-| PostgreSQL 16  | Base de datos               |
-| Docker         | Contenerización             |
-| Docker Compose | Orquestación local          |
-| Composer       | Gestión de dependencias PHP |
-| PHPUnit        | Testing                     |
-| Git / GitHub   | Control de versiones        |
-| GitHub Actions | Integración continua        |
-| Python         | Componente NLP              |
-| FastAPI        | API del servicio NLP        |
-| scikit-learn   | Clasificación de texto      |
+### Backend
 
-> Los componentes que todavía no se han implementado se incorporarán progresivamente durante el desarrollo.
+* **PHP**
+* **Laravel**
+* **Eloquent ORM**
+* **Artisan**
 
----
+Laravel proporciona la estructura principal de la aplicación, incluyendo routing, controladores, validación, ORM, comandos de consola, Jobs y Scheduler.
 
-[ÍNDICE](#índice)
-# API REST
+### Frontend
 
-FormsFlow dispone de una API REST para consultar, crear y gestionar solicitudes.
+* **Blade**
+* **HTML**
+* **CSS / SCSS**
+* **JavaScript**
+* **Vite**
 
-## Endpoints
+Blade se utiliza para construir las interfaces de la aplicación y Vite para gestionar y generar los recursos frontend para desarrollo y producción.
 
-| Método  | Endpoint                                 | Descripción                                                     | Respuesta     |
-| ------- | ---------------------------------------- | --------------------------------------------------------------- | ------------- |
-| `GET`   | `/api/requests`                          | Obtiene un listado resumido de solicitudes                      | `200 OK`      |
-| `POST`  | `/api/requests`                          | Crea una nueva solicitud                                        | `201 Created` |
-| `GET`   | `/api/requests/{reference_code}`         | Obtiene una solicitud completa mediante su código de referencia | `200 OK`      |
-| `PATCH` | `/api/requests/{reference_code}/archive` | Archiva una solicitud                                           | `200 OK`      |
+### Base de datos
 
----
+FormsFlow utiliza una base de datos relacional gestionada mediante las migraciones y modelos de Laravel.
 
-## Listar solicitudes
+El acceso a los datos se realiza mediante Eloquent y consultas SQL cuando resulta necesario realizar operaciones agregadas o específicas.
 
-```http
-GET /api/requests
-Accept: application/json
-```
+### API
 
-La respuesta contiene un listado resumido de las solicitudes:
+La aplicación dispone de una API REST para la gestión de solicitudes.
 
-```json
-{
-    "data": [
-        {
-            "reference_code": "FF-2026-000010",
-            "organization": "Educación",
-            "unit": "Dirección General de Innovación y Formación del Profesorado",
-            "subject": "Problema con un servicio",
-            "status": "pending",
-            "category": null,
-            "priority": null,
-            "created_at": "2026-08-20T09:48:27.000000Z"
-        }
-    ]
-}
-```
+La API permite, entre otras operaciones:
 
-El listado utiliza una selección reducida de campos y no incluye los datos personales ni el contenido completo de la solicitud.
+* Consultar solicitudes.
+* Crear solicitudes.
+* Consultar una solicitud concreta.
+* Archivar solicitudes.
 
----
+Las operaciones están validadas y disponen de pruebas funcionales automatizadas en `tests/Feature/ApplicationRequestApiTest.php`. La estrategia de testing y el resultado de las pruebas se describen en la sección [Testing](#testing).
 
-## Crear una solicitud
+### Procesamiento de datos
 
-```http
-POST /api/requests
-Content-Type: application/json
-Accept: application/json
-```
-
-Ejemplo de petición:
-
-```json
-{
-    "name": "Carlos López",
-    "email": "carlos.lopez@example.com",
-    "phone": "600987654",
-    "organization": "Educación",
-    "unit": "Dirección General de Innovación y Formación del Profesorado",
-    "subject": "Problema con un servicio",
-    "statement": "No puedo acceder correctamente al servicio.",
-    "request_text": "Solicito que se revise el problema."
-}
-```
-
-Respuesta:
-
-```json
-{
-    "message": "Solicitud creada correctamente.",
-    "data": {
-        "reference_code": "FF-2026-000010",
-        "status": "pending",
-        "created_at": "2026-08-20T09:48:27.000000Z"
-    }
-}
-```
-
-La aplicación genera automáticamente el `reference_code` y asigna inicialmente el estado `pending`.
-
----
-
-## Consultar una solicitud
-
-```http
-GET /api/requests/FF-2026-000010
-Accept: application/json
-```
-
-La respuesta contiene la información completa de la solicitud:
-
-```json
-{
-    "data": {
-        "id": 10,
-        "reference_code": "FF-2026-000010",
-        "name": "Carlos López",
-        "email": "carlos.lopez@example.com",
-        "phone": "600987654",
-        "organization": "Educación",
-        "unit": "Dirección General de Innovación y Formación del Profesorado",
-        "subject": "Problema con un servicio",
-        "statement": "No puedo acceder correctamente al servicio.",
-        "request_text": "Solicito que se revise el problema.",
-        "status": "pending",
-        "category": null,
-        "priority": null,
-        "created_at": "2026-08-20T09:48:27.000000Z",
-        "updated_at": "2026-08-20T09:48:27.000000Z"
-    }
-}
-```
-
-Si el código de referencia no existe, la API devuelve:
+El procesamiento se realiza mediante un pipeline ETL implementado dentro de Laravel:
 
 ```text
-404 Not Found
+Extract
+   ↓
+Transform
+   ↓
+Load
 ```
 
----
+Durante la transformación se normaliza la información y se aplica el clasificador NLP.
 
-## Archivar una solicitud
+### PLN
 
-```http
-PATCH /api/requests/FF-2026-000010/archive
-Accept: application/json
-```
-
-Respuesta:
-
-```json
-{
-    "message": "Solicitud archivada correctamente.",
-    "data": {
-        "reference_code": "FF-2026-000010",
-        "status": "archived"
-    }
-}
-```
-
-La operación modifica el estado de la solicitud de `pending` a `archived` y persiste el cambio en PostgreSQL.
-
----
-
-## Validación
-
-Las solicitudes de creación se validan mediante `StoreApplicationRequest`.
-
-Los campos obligatorios y las reglas de validación están centralizados en este `Form Request`.
-
-Si faltan campos obligatorios o los datos no cumplen las reglas establecidas, la API devuelve:
+El componente de PLN está implementado actualmente como un servicio PHP:
 
 ```text
-422 Unprocessable Content
+App\Services\RequestNLPClassifier
 ```
 
-junto con los errores de validación correspondientes.
+El sistema **normaliza el texto** y utiliza términos ponderados para determinar la categoría y prioridad de una solicitud.
+
+No se utiliza actualmente un modelo de aprendizaje automático entrenado. El enfoque se ha elegido por su sencillez, trazabilidad y adecuación al alcance del proyecto demostrador.
+
+### Testing
+
+El proyecto utiliza:
+
+* **PHPUnit / Laravel Testing**
+* **Tests unitarios**
+* **Tests funcionales de API**
+
+Actualmente la suite contiene:
+
+```text
+17 tests
+48 assertions
+```
 
 ---
 
-## Códigos HTTP utilizados
+### Contenedores y desarrollo
 
-| Código | Significado                       |
-| ------ | --------------------------------- |
-| `200`  | Operación realizada correctamente |
-| `201`  | Solicitud creada correctamente    |
-| `404`  | Solicitud no encontrada           |
-| `422`  | Datos de entrada no válidos       |
+El entorno de desarrollo utiliza:
+
+* **Docker**
+* **Docker Compose**
+* **Composer**
+* **npm**
+* **Vite**
+
+El objetivo de Docker es proporcionar un entorno reproducible para ejecutar la aplicación y sus servicios asociados.
 
 ---
-[ÍNDICE](#índice)
-## Pipeline ETL
 
-FormsFlow incorpora un pipeline ETL que permite transformar las solicitudes almacenadas en `application_requests` en registros preparados para su explotación y posterior clasificación mediante NLP.
+## ETL y procesamiento NLP
 
-```mermaid
-flowchart LR
-    A[application_requests] --> B[Extract]
-    B --> C[Transform]
-    C --> D[Load]
-    D --> E[(processed_requests)]
+FormsFlow incorpora un **pipeline ETL** para transformar las solicitudes almacenadas en la aplicación en registros preparados para su explotación.
 
-    C --> F[normalized_text]
-    E --> G[Explotación del dato]
-    E --> H[Clasificación NLP]
+El proceso se implementa mediante el servicio:
 
-    style A fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
-    style B fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
-    style C fill:#dcedc8,stroke:#388e3c,stroke-width:2px
-    style D fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
-    style E fill:#a5d6a7,stroke:#1b5e20,stroke-width:2px
-    style F fill:#f1f8e9,stroke:#558b2f,stroke-width:2px
-    style G fill:#f1f8e9,stroke:#558b2f,stroke-width:2px
-    style H fill:#f1f8e9,stroke:#558b2f,stroke-width:2px
+```text
+App\Services\RequestETLService
+```
+
+y se ejecuta mediante el comando Artisan:
+
+```bash
+php artisan etl:process
+```
+
+El pipeline sigue tres etapas:
+
+```text
+Extract
+   ↓
+Transform
+   ↓
+Load
 ```
 
 ### Funcionamiento
 
-**Extract**
+#### Extract
 
-- El proceso obtiene las solicitudes almacenadas en `application_requests` mediante `RequestETLService`.
-
-**Transform**
-
-- Los datos se limpian y normalizan. 
-
-- Los campos `subject`, `statement` y `request_text` se combinan para generar `normalized_text`, que servirá como base para el procesamiento posterior.
-
-**Load**
-
-- Los datos transformados se almacenan en `processed_requests`. 
-
-- El proceso utiliza `reference_code` como identificador único y `updateOrCreate()` para evitar registros duplicados cuando el pipeline se ejecuta nuevamente.
-
-El pipeline puede ejecutarse mediante el comando Artisan:
-
-```bash
-docker compose exec app php artisan etl:process
-```
-
----
-## Automatización y explotación del dato
-
-FormsFlow incorpora un proceso automatizado para **generar informes estadísticos** a partir de los datos almacenados en `processed_requests`.
-
-El objetivo es demostrar que los datos transformados mediante el pipeline ETL pueden ser posteriormente explotados mediante procesos automatizados.
-
-### Flujo de automatización
+La primera etapa obtiene las solicitudes almacenadas en `application_requests`.
 
 ```text
-processed_requests
+application_requests
         ↓
-Laravel Scheduler
-        ↓
-GenerateRequestReportJob
-        ↓
-Cálculo de estadísticas
-        ↓
-RequestReport
-        ↓
-request_reports
----
+      Extract
 ```
 
-### GenerateRequestReportJob
+El proceso trabaja con los registros existentes y los prepara para su transformación.
 
-El Job `GenerateRequestReportJob` se encarga de:
+#### Transform
 
-* calcular el número total de solicitudes procesadas;
-* agrupar las solicitudes por organización;
-* agrupar las solicitudes por estado;
-* construir un informe estructurado;
-* convertir las estadísticas en arrays simples;
-* guardar el resultado en `request_reports`.
+Durante la transformación se **combinan y normalizan los datos** necesarios para generar el registro procesado. El texto utilizado para la clasificación se normaliza antes de ser enviado al componente NLP.
 
-Las estadísticas agrupadas por ``organización`` y ``estado`` se almacenan como JSON.
+La normalización incluye:
 
-### Persistencia de los informes
+* Conversión a minúsculas.
+* Normalización de caracteres.
+* Eliminación de diferencias producidas por las tildes.
+* Normalización de espacios.
 
-Cada ejecución del Job genera un nuevo registro en `request_reports`.
+Posteriormente se ejecuta:
 
-El informe contiene:
+```text
+RequestNLPClassifier
+        ↓
+category
+priority
+```
 
-* fecha y hora de generación;
-* número total de solicitudes;
-* distribución de solicitudes por organización;
-* distribución de solicitudes por estado.
+El resultado de la transformación contiene la información necesaria para crear el registro correspondiente en `processed_requests`.
 
-Esto permite conservar un histórico de los informes generados.
+#### Load
 
-### Scheduler
+La tercera etapa almacena el resultado del procesamiento en `processed_requests`.
 
-La ejecución del Job se programa mediante el Scheduler de Laravel:
+De esta forma se mantiene separada la información original de la información transformada y enriquecida.
+
+```text
+ApplicationRequest
+       ↓
+     Extract
+       ↓
+    Transform
+       ↓
+      NLP
+       ↓
+      Load
+       ↓
+ProcessedRequest
+```
+
+### Clasificación NLP
+
+FormsFlow incorpora un **componente de procesamiento de lenguaje natural** orientado a la **clasificación de solicitudes**.
+
+El servicio responsable es:
+
+```text
+App\Services\RequestNLPClassifier
+```
+
+El clasificador utiliza un conjunto de términos ponderados para calcular una puntuación para cada categoría y nivel de prioridad.
+
+Las categorías disponibles son:
+
+* `informacion`
+* `incidencia`
+* `documentacion`
+
+Las prioridades disponibles son:
+
+* `baja`
+* `media`
+* `alta`
+
+El sistema también contempla la normalización de textos con caracteres acentuados.
+
+Por ejemplo, un texto como:
+
+```text
+El servicio no está disponible.
+```
+
+se normaliza antes de realizar la comparación de términos:
+
+```text
+El servicio no está disponible.
+              ↓
+el servicio no esta disponible.
+```
+
+La normalización convierte el texto a minúsculas, elimina las diferencias entre caracteres acentuados y no acentuados y normaliza los espacios.
+
+Esto permite que los términos definidos por el clasificador puedan coincidir independientemente de que el texto original contenga mayúsculas o tildes.
+
+La clasificación de prioridad utiliza términos asociados a diferentes niveles de gravedad. Algunos **indicadores de prioridad alta** son:
+
+* servicio no disponible;
+* servicio bloqueado;
+* urgente;
+* ningún usuario puede utilizar el servicio.
+
+Los indicadores de incidencia general permiten identificar problemas de prioridad media.
+
+El sistema utiliza reglas explícitas y trazables, por lo que el resultado puede analizarse y explicarse a partir de los términos que han contribuido a la clasificación.
+
+**No se utiliza actualmente un modelo de aprendizaje automático entrenado**. El enfoque basado en reglas se ha elegido para mantener el componente NLP pequeño, determinista y fácilmente verificable dentro del alcance del proyecto.
+
+---
+
+## Automatización
+
+FormsFlow utiliza **mecanismos de automatización** proporcionados por Laravel para **ejecutar procesos** de forma programada y desacoplar determinadas tareas del flujo principal de la aplicación.
+
+El procesamiento ETL se encapsula en un comando Artisan:
+
+```bash
+php artisan etl:process
+```
+
+El comando utiliza `RequestETLService` para:
+
+1. Extraer las solicitudes.
+2. Transformar la información.
+3. Aplicar la clasificación NLP.
+4. Cargar los registros procesados.
+
+El comando muestra al finalizar el número de solicitudes procesadas.
+
+Ejemplo:
+
+```text
+Processed 14 application requests.
+```
+
+La arquitectura permite ejecutar este proceso manualmente durante el desarrollo o integrarlo con el sistema de planificación de Laravel para automatizar su ejecución.
+
+La **automatización** se mantiene **separada de la lógica de transformación**, de manera que el comando Artisan actúa como punto de entrada del proceso y `RequestETLService` contiene la lógica principal.
+
+---
+
+## Dashboard y explotación del dato
+
+El Dashboard proporciona una interfaz para consultar y explotar la información almacenada en `processed_requests`.
+
+![Dashboard de FormsFlow](docs/images/dashboard_1.png)
+Entre las funcionalidades disponibles se encuentran:
+
+* Consulta de solicitudes procesadas.
+* Búsqueda por referencia.
+* Visualización de categoría.
+* Visualización de prioridad.
+* Visualización del estado.
+* Visualización de la fecha de procesamiento.
+* Paginación.
+* Estadísticas agrupadas por organización.
+* Porcentaje de solicitudes por organización.
+* Consulta del detalle de una solicitud.
+
+![Dashboard de FormsFlow](docs/images/dashboard_2.png)
+### Paginación
+
+El Dashboard muestra las solicitudes procesadas más recientes con paginación. El sistema mantiene un **máximo de 20 solicitudes** recientes disponibles en la consulta y utiliza 10 solicitudes por página.
+
+La paginación se realiza en el servidor. Esto evita cargar innecesariamente todos los registros en una única página y permite mantener una interfaz sencilla aunque el número de solicitudes aumente. La consulta utiliza la paginación proporcionada por Laravel.
+
+### Búsqueda
+
+El Dashboard permite buscar solicitudes mediante su referencia. Para realizar una búsqueda, el usuario introduce **parte o la totalidad de la referencia** en el campo de búsqueda y pulsa el botón de búsqueda.
+
+Por ejemplo:
+
+```text
+Referencia: FF-2026-000023
+```
+
+![Búsqueda por Referencia](docs/images/search_1.png)
+
+La aplicación busca coincidencias en el campo `reference_code`.
+
+También es posible introducir únicamente una parte de la referencia:
+
+```text
+Referencia: 000023
+```
+
+La búsqueda devuelve las solicitudes cuya referencia contiene el texto introducido.
+
+La búsqueda se realiza sobre `reference_code` y mantiene los parámetros de consulta al navegar entre las páginas mediante `withQueryString()`.
+
+La búsqueda se aplica mediante una consulta `LIKE`:
 
 ```php
-Schedule::job(new GenerateRequestReportJob())->daily();
+$query->where(
+    'reference_code',
+    'like',
+    '%'.$reference.'%'
+);
 ```
 
-La tarea está configurada para ejecutarse una vez al día.
+Esto permite realizar búsquedas parciales sin necesidad de introducir la referencia completa.
 
-**Nota**
-Durante el desarrollo se utilizó temporalmente `everyMinute()` para comprobar la ejecución del Scheduler sin tener que esperar a la hora programada.
+### Estadísticas por organización
 
-### Comprobación con Docker
+Las solicitudes procesadas se agrupan por organización para obtener una visión resumida de la distribución de solicitudes.
 
-La ejecución del Scheduler se ha probado dentro del entorno Docker mediante:
+El porcentaje se calcula respecto al **total de solicitudes procesadas**, no respecto a las solicitudes que aparecen en la página actual.
 
-```bash
-docker compose exec app php artisan schedule:run
-```
+La representación visual utiliza barras proporcionales para facilitar la comparación entre organizaciones.
 
-La tarea fue detectada y ejecutada correctamente:
+Por ejemplo:
 
 ```text
-Running [App\Jobs\GenerateRequestReportJob] ... DONE
+Educación                              5 (35,7%)
+████████████████████████████████████████
+
+Economía, Hacienda y Fondos Europeos  4 (28,6%)
+██████████████████████████████
+
+IA, Desarrollo Digital...              3 (21,4%)
+██████████████████████
+
+Presidencia, Sanidad y Emergencias     2 (14,3%)
+██████████████
 ```
 
-Posteriormente se verificó que el informe había sido almacenado en `request_reports`.
+La información estadística se obtiene a partir de los registros procesados, por lo que **puede actualizarse automáticamente** cuando se incorporan nuevas solicitudes.
 
-### Decisiones de diseño
+### Estados de las solicitudes
 
-Los resultados de las consultas Eloquent no se almacenan directamente como colecciones de modelos.
+Las solicitudes pueden encontrarse en diferentes estados dentro del flujo de gestión.
 
-Primero se transforman en arrays simples mediante `pluck()` y `toArray()`. Posteriormente Laravel utiliza los casts definidos en `RequestReport` para almacenar estos datos como JSON.
+Los datos de demostración utilizan actualmente:
 
-De esta forma se separa:
+* `pending`: solicitud pendiente de gestión.
+* `archived`: solicitud archivada.
+
+En el conjunto actual de demostración existen:
 
 ```text
-Consulta Eloquent
-        ↓
-Colección
-        ↓
-Datos simples
-        ↓
-Array PHP
-        ↓
-JSON
-        ↓
-PostgreSQL
+10 solicitudes pendientes
+4 solicitudes archivadas
 ```
 
----
+### Consulta del detalle
 
-[ÍNDICE](#índice)
+Cada solicitud mostrada en el Dashboard dispone de un botón **Ver**.
+
+De esta forma, el usuario puede consultar el contenido completo de una solicitud desde el listado sin tener que navegar a una página diferente.
+
+Al pulsar este botón se abre un modal con el detalle de la solicitud seleccionada, sin necesidad de abandonar la página principal.
+
+![Consulta de Detalle](docs/images/modal_1.png)
+
+El modal permite consultar de forma agrupada la información de la solicitud, incluyendo:
+
+- Referencia.
+- Organización.
+- Unidad.
+- Estado.
+- Categoría.
+- Prioridad.
+- Fecha de registro.
+- Asunto.
+- Descripción de la solicitud.
+
+El detalle de la solicitud incluye un campo de *Descripción de la solicitud* que **no corresponde directamente a un único campo del formulario**.
+
+Esta descripción se construye **agrupando tres elementos** introducidos por el usuario:
+
+```text
+Descripción de la solicitud
+│
+├── Exposición de la solicitud
+├── Actuación solicitada
+└── Texto de la solicitud
+```
+
+De esta forma, el modal presenta el contenido de la solicitud de **manera unificada**, aunque la información se haya introducido originalmente en diferentes campos del formulario.
+
+Esta composición se realiza únicamente para **facilitar la consulta y presentación de la información**, manteniendo los campos originales almacenados de forma independiente en la base de datos.
+
+### Clasificación y explotación
+
+La categoría y prioridad generadas por el componente NLP se almacenan junto al registro procesado.
+
+Esto permite realizar consultas agregadas como:
+
+```text
+Categoría             Prioridad       Total
+------------------------------------------------
+documentacion         baja              1
+incidencia            alta              3
+incidencia            media             4
+informacion           baja              6
+```
+
+De esta forma, el resultado del procesamiento automático **puede utilizarse posteriormente para generar indicadores** y facilitar la consulta de la información.
+
 ## Testing
 
-El proyecto utiliza PHPUnit para realizar pruebas automatizadas de la aplicación y de la API REST.
+FormsFlow **incorpora pruebas automatizadas** para validar tanto la lógica de clasificación como diferentes operaciones de la API y del procesamiento ETL.
 
-Los tests se ejecutan sobre una base de datos PostgreSQL independiente de la utilizada durante el desarrollo: ``formsflow_testing``
+La estrategia de pruebas se divide principalmente en:
 
-Esto **permite mantener aislados los datos** generados durante las pruebas y **evitar que las ejecuciones** de PHPUnit **modifiquen la base de datos** de desarrollo.
+- Tests unitarios.
+- Tests funcionales de API.
+- Tests de los procesos de extracción y transformación.
 
-El entorno de testing está configurado en `phpunit.xml` y utiliza el mismo motor PostgreSQL que la aplicación. De esta forma, las pruebas también cubren características específicas de PostgreSQL utilizadas por el proyecto, como la `SEQUENCE` empleada para generar automáticamente los códigos de referencia de las solicitudes.
+Las pruebas se ejecutan mediante el sistema de testing integrado en Laravel.
 
-### Ejecución de los tests
-
-Los tests se ejecutan dentro del contenedor Docker mediante:
+Para ejecutar la suite completa:
 
 ```bash
 docker compose exec app php artisan test
 ```
 
-### Resultado actual
+![Ejecución de las pruebas automatizadas](docs/images/testing_1.png)
 
-La batería de pruebas actual se ejecuta correctamente:
+La ejecución de la suite completa mediante Artisan muestra el resultado de las pruebas automatizadas y permite comprobar que todos los tests se ejecutan correctamente.
 
-- **8 tests**
-- **28 assertions**
-- **0 errores**
+Además, se utiliza **Laravel Pint** para comprobar el cumplimiento de las **reglas de estilo** del proyecto:
 
-![Resultado de los tests](docs/images/tests_api.png)
+```bash
+docker compose exec app ./vendor/bin/pint --test
 
-*Figura 2. Ejecución de la suite de pruebas automatizadas.*
+```
 
-La suite incluye pruebas de:
 
-- Listado de solicitudes mediante API REST.
-- Creación de solicitudes.
-- Validación de datos de entrada.
-- Consulta de solicitudes mediante código de referencia.
-- Respuesta `404` para solicitudes inexistentes.
-- Archivado de solicitudes.
-- Persistencia de los cambios en PostgreSQL.
-- Generación y utilización del código de referencia.
+También puede comprobarse que no existen errores relacionados con espacios en blanco o finales de línea mediante:
 
-La estrategia de testing se ampliará progresivamente a medida que se incorporen nuevas funcionalidades al proyecto.
+```bash
+git diff --check
+```
+### Pruebas del clasificador NLP
+
+El clasificador `RequestNLPClassifier` dispone de **pruebas unitarias específicas**.
+
+Actualmente se comprueban diferentes escenarios:
+
+* Solicitud de información → prioridad baja.
+* Incidencia de servicio → prioridad media.
+* Solicitud de documentación → prioridad baja.
+* Servicio bloqueado → prioridad alta.
+* Solicitud con términos de información e incidencia → prevalencia de la incidencia.
+* Solicitud de documentación relacionada con un procedimiento.
+* Servicio no disponible y urgente → incidencia de prioridad alta.
+
+Estas pruebas permiten comprobar tanto la clasificación de la categoría como la asignación de prioridad.
+
+Para ejecutar únicamente estas pruebas:
+
+```bash
+docker compose exec app php artisan test --filter=RequestNLPClassifierTest
+```
+
+![Ejecución de las pruebas RequestNLPClassifierTest](docs/images/testing_2.png)
+
+### Pruebas de la API
+
+La API REST dispone de pruebas funcionales que cubren:
+
+* Listado de solicitudes.
+* Creación de solicitudes.
+* Validación de datos incorrectos.
+* Consulta de una solicitud existente.
+* Respuesta cuando una solicitud no existe.
+* Archivado de solicitudes.
+* Extracción de datos mediante el ETL.
+* Transformación de datos mediante el ETL.
+
+Esto permite comprobar el funcionamiento de las diferentes capas principales de la aplicación.
+
+![Ejecución de las pruebas API REST](docs/images/tests_api.png)
 
 ---
 
+## Docker
+
+FormsFlow utiliza Docker para proporcionar un entorno de desarrollo reproducible.
+
+Docker Compose permite **levantar los servicios necesarios** para ejecutar la aplicación sin depender de una configuración manual específica del sistema operativo.
+
+Los principales comandos utilizados durante el desarrollo son:
+
+```bash
+docker compose up -d
+```
+
+para iniciar los servicios.
+
+Para consultar el estado:
+
+```bash
+docker compose ps
+```
+
+Para acceder al contenedor de la aplicación:
+
+```bash
+docker compose exec app bash
+```
+
+Para ejecutar comandos Artisan:
+
+```bash
+docker compose exec app php artisan <comando>
+```
+
+Por ejemplo:
+
+```bash
+docker compose exec app php artisan test
+```
+
+El proyecto utiliza Docker principalmente para el entorno de ejecución de Laravel y la base de datos.
+
+---
+
+[ÍNDICE](#índice)
 ## Instalación
 
 ### Requisitos
 
-* Docker Desktop
-* Git
+Para ejecutar FormsFlow localmente se necesita disponer de:
 
-No es necesario instalar PHP, Composer o PostgreSQL directamente en el equipo, ya que forman parte del entorno Docker.
+* Git.
+* Docker.
+* Docker Compose.
+* Node.js y npm.
+* Composer, si se realizan tareas de instalación o desarrollo fuera del contenedor.
+
+Se recomienda utilizar versiones compatibles con las dependencias definidas en el proyecto.
 
 ### Ejecutar el proyecto
 
 Clonar el repositorio:
 
 ```bash
-git clone git@github.com:viorbe20/formsflow.git
+git clone <URL_DEL_REPOSITORIO>
 cd formsflow
 ```
 
@@ -626,10 +843,28 @@ Crear el archivo de configuración:
 cp .env.example .env
 ```
 
-Arrancar los servicios:
+En Windows PowerShell puede utilizarse:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Iniciar los servicios:
 
 ```bash
 docker compose up -d
+```
+
+Instalar las dependencias PHP si es necesario:
+
+```bash
+docker compose exec app composer install
+```
+
+Generar la clave de aplicación:
+
+```bash
+docker compose exec app php artisan key:generate
 ```
 
 Ejecutar las migraciones:
@@ -638,143 +873,406 @@ Ejecutar las migraciones:
 docker compose exec app php artisan migrate
 ```
 
-La aplicación estará disponible en:
+Instalar las dependencias frontend:
+
+```bash
+npm install
+```
+
+Generar los recursos frontend para producción:
+
+```bash
+npm run build
+```
+
+La aplicación puede iniciarse entonces utilizando el entorno configurado mediante Docker Compose.
+
+### Datos de demostración
+
+El proyecto incluye un **Seeder** específico para **generar datos ficticios de demostración**:
+
+```bash
+docker compose exec app php artisan db:seed --class=DemoDataSeeder
+```
+
+El Seeder genera solicitudes de ejemplo con diferentes:
+
+* Organizaciones.
+* Unidades.
+* Tipos de solicitud.
+* Estados.
+* Textos para clasificación NLP.
+
+Después de generar los datos, el pipeline ETL puede ejecutarse mediante:
+
+```bash
+docker compose exec app php artisan etl:process
+```
+
+El comando procesa las solicitudes almacenadas y genera los correspondientes registros procesados.
+
+> **Importante:** `DemoDataSeeder` está pensado para inicializar el conjunto de datos de demostración. No debe ejecutarse repetidamente sobre una base de datos que ya contenga esos registros si no se desea duplicarlos.
+
+### Generación de recursos frontend
+
+Durante el desarrollo:
+
+```bash
+npm run dev
+```
+
+Para generar los recursos optimizados para producción:
+
+```bash
+npm run build
+```
+
+El build actual de Vite genera correctamente los archivos de producción en:
 
 ```text
-http://localhost:8000
+public/build/
 ```
 
 ---
-[ÍNDICE](#índice)
-## Pruebas del clasificador NLP
-El clasificador dispone de pruebas unitarias para verificar
-la asignación de categorías y niveles de prioridad.
+## Despliegue
 
-![NLP classifier tests](docs/images/nlp-tests.png)
---- 
+FormsFlow está preparado para ejecutarse mediante contenedores Docker y se plantea su despliegue público utilizando una arquitectura separada para la aplicación y la base de datos.
+
+La aplicación Laravel se desplegará mediante Docker en **Koyeb**, mientras que la base de datos PostgreSQL se alojará en **Supabase**.
+
+La arquitectura de despliegue será:
+
+```text
+                         GitHub
+                            │
+                            │ Deploy
+                            ▼
+                    ┌───────────────┐
+                    │     Koyeb     │
+                    │               │
+                    │    Laravel    │
+                    │    Docker     │
+                    └───────┬───────┘
+                            │
+                            │ PostgreSQL
+                            ▼
+                    ┌───────────────┐
+                    │   Supabase    │
+                    │               │
+                    │  PostgreSQL   │
+                    └───────────────┘
+```
+
+### Entorno de demostración
+
+El objetivo del despliegue es proporcionar una **demo pública de FormsFlow** que permita comprobar directamente el funcionamiento de la aplicación sin necesidad de instalar el proyecto localmente.
+
+Supabase proporciona una base de datos PostgreSQL gestionada dentro de su plan gratuito, suficiente para el volumen reducido de datos utilizado por la demo.
+
+La configuración definitiva del despliegue, las variables de entorno y los pasos de publicación se documentarán una vez completado y validado el despliegue.
+
+### Acceso a la demo
+
+**Demo pública:** pendiente de despliegue.
+
+**Repositorio:** pendiente de añadir la URL definitiva de GitHub.
+
+---
 [ÍNDICE](#índice)
+## Estructura del proyecto
+
+La estructura principal de FormsFlow sigue la organización habitual de una aplicación Laravel:
+
+```text
+formsflow/
+├── app/
+│   ├── Console/
+│   │   └── Commands/
+│   ├── Enums/
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   └── Requests/
+│   ├── Models/
+│   └── Services/
+│
+├── database/
+│   ├── factories/
+│   ├── migrations/
+│   └── seeders/
+│
+├── resources/
+│   ├── css/
+│   ├── js/
+│   └── views/
+│
+├── routes/
+│   ├── api.php
+│   ├── console.php
+│   └── web.php
+│
+├── tests/
+│   ├── Feature/
+│   └── Unit/
+│
+├── public/
+│   └── build/
+│
+├── docker/
+├── docker-compose.yml
+├── composer.json
+├── package.json
+└── README.md
+```
+
+Las principales responsabilidades son:
+
+| Directorio             | Responsabilidad                     |
+| ---------------------- | ----------------------------------- |
+| `app/Http/Controllers` | Controladores web y API             |
+| `app/Models`           | Modelos Eloquent                    |
+| `app/Services`         | Lógica de procesamiento y servicios |
+| `app/Enums`            | Valores enumerados del dominio      |
+| `app/Console/Commands` | Comandos Artisan                    |
+| `database/migrations`  | Estructura de la base de datos      |
+| `database/seeders`     | Datos iniciales y de demostración   |
+| `resources/views`      | Vistas Blade                        |
+| `resources/js`         | JavaScript                          |
+| `resources/css`        | Estilos                             |
+| `routes`               | Rutas web, API y consola            |
+| `tests/Feature`        | Pruebas funcionales                 |
+| `tests/Unit`           | Pruebas unitarias                   |
+
+
+## Decisiones técnicas
+
+### Laravel como framework principal
+
+Se ha utilizado Laravel como framework principal porque permite integrar en una misma aplicación diferentes necesidades del proyecto:
+
+- Desarrollo web.
+- Routing.
+- Validación.
+- Acceso a base de datos mediante Eloquent.
+- API REST.
+- Comandos Artisan.
+- Jobs y Scheduler.
+- Testing.
+- Gestión de configuración.
+
+Esto permite mantener una **arquitectura relativamente sencilla** sin introducir tecnologías adicionales innecesarias para el alcance del demostrador.
+
+### Separación entre solicitudes recibidas y solicitudes procesadas
+
+Se han separado los datos originales de las solicitudes (`application_requests`) de los registros generados por el procesamiento (`processed_requests`).
+
+Esta decisión permite representar claramente el flujo:
+
+```text
+Datos de entrada
+      ↓
+Procesamiento
+      ↓
+Datos preparados para explotación
+```
+
+La separación **facilita** además el **desarrollo y prueba independiente del pipeline ETL**.
+
+### Servicio independiente para el ETL
+
+La lógica del proceso ETL se concentra en:
+
+```text
+App\Services\RequestETLService
+```
+
+El comando Artisan actúa como punto de entrada:
+
+```bash
+php artisan etl:process
+```
+
+De esta forma, la lógica de extracción, transformación y carga no queda mezclada directamente con el código del comando.
+
+Esta **separación** facilita la **reutilización** y las **pruebas del proceso**.
+
+### Servicio independiente para el NLP
+
+La clasificación de solicitudes se concentra en:
+
+```text
+App\Services\RequestNLPClassifier
+```
+
+El clasificador es independiente del controlador y del proceso ETL.
+
+Esto permite probar la clasificación mediante **tests unitarios sin necesidad de ejecutar todo el flujo** de la aplicación.
+
+### NLP basado en reglas
+
+Se ha optado inicialmente por un sistema de clasificación basado en **reglas y términos ponderados**.
+
+Esta decisión responde principalmente al alcance del proyecto.
+
+El sistema permite:
+
+* Mantener el comportamiento determinista.
+* Explicar por qué se ha asignado una categoría o prioridad.
+* Evitar la necesidad de disponer de un dataset etiquetado.
+* Mantener el proyecto autocontenido.
+* Facilitar las pruebas automatizadas.
+
+No se pretende presentar este componente como un modelo de inteligencia artificial entrenado, sino como una **aplicación sencilla de técnicas de PLN para clasificación y priorización de texto**.
+
+### Docker desde el inicio
+
+El entorno de desarrollo se ha basado en Docker y Docker Compose desde las primeras fases del proyecto.
+
+Esto permite **reducir las diferencias entre entornos** y facilita que otra persona pueda reproducir la instalación siguiendo las instrucciones del README.
+
+### Datos de demostración
+
+FormsFlow utiliza **datos de demostración** y no contiene datos personales reales de personas solicitantes.
+
+Las organizaciones y unidades administrativas utilizadas en los ejemplos están basadas en organismos y unidades reales, utilizando **información pública** como referencia para que el escenario resulte más realista.
+
+Las solicitudes, nombres de personas, **datos de contacto**, asuntos y textos utilizados para probar el flujo de la aplicación son **ficticios** y han sido creados específicamente para el proyecto.
+
+De esta forma, el proyecto combina referencias institucionales basadas en información pública con datos de solicitud completamente ficticios, evitando utilizar información personal real en la aplicación.
+
+Los datos de demostración permiten **reproducir el flujo completo** de registro, procesamiento ETL, clasificación NLP y explotación del dato sin utilizar expedientes ni solicitudes reales.
+
+### Alcance controlado
+
+Se ha priorizado implementar un flujo completo y funcional frente a incorporar un gran número de funcionalidades independientes.
+
+El proyecto busca demostrar diferentes capacidades integradas:
+
+```text
+Desarrollo web
+      +
+API
+      +
+Base de datos
+      +
+ETL
+      +
+NLP
+      +
+Automatización
+      +
+Explotación del dato
+      +
+Testing
+```
+
+Las funcionalidades que requieren una inversión significativa de tiempo y que no son necesarias para demostrar estos objetivos se mantienen como posibles mejoras futuras.
+
+---
+
 ## Mejoras futuras
 
-### Autenticación y gestión de usuarios
+El proyecto se ha diseñado para poder ampliarse progresivamente. Las siguientes funcionalidades quedan fuera del alcance actual, pero podrían incorporarse en futuras iteraciones.
 
-Podríamos añadir posteriormente:
+### Historial avanzado de solicitudes
 
-```
-Usuario
-   ↓
-Autenticación
-   ↓
-Rol
-   ├── Administrador
-   │     ├── gestionar usuarios
-   │     └── gestionar solicitudes
-   │
-   └── Usuario
-         ├── crear solicitudes
-         └── consultar sus solicitudes
-```
+El Dashboard dispone actualmente de búsqueda por referencia y paginación.
 
-- Incorporar un proceso automático para detectar solicitudes que requieran atención, utilizando la categoría y prioridad obtenidas mediante el componente de NLP.
-- Ampliar la explotación del dato mediante nuevos indicadores y visualizaciones.
-- Incorporar nuevas reglas de automatización sobre las solicitudes clasificadas.
-- Informe de actvidad. 
-    - Como evolución del sistema, se podrá permitir que el usuario exporte el informe generado a diferentes formatos, por ejemplo:
+Como evolución futura se podría implementar un historial avanzado con filtros por:
 
-        - PDF.
-        - DOCX.
-        - CSV.
-        - Otros formatos de intercambio de datos.
-    - Una vez tengamos el informe dentro de la aplicación, podremos permitir que el usuario lo exporte, por ejemplo:
+* Rango de fechas.
+* Organización.
+* Unidad.
+* Estado.
+* Categoría.
+* Prioridad.
 
-        ```text
-        Informe
-        │
-        ├── Ver en pantalla
-        ├── Exportar PDF
-        ├── Exportar DOCX
-        └── Exportar CSV
-   - Posteriormente podríamos permitir: 
-        - ver informes anteriores;
-        - comparar informes; 
-        - exportarlos a PDF/DOCX/CSV.     ```
+El botón de acceso al historial ya se ha previsto visualmente en la interfaz.
 
-- La automatización puede ampliarse posteriormente con:
+### Autenticación y autorización
 
-    * visualización de los informes desde una interfaz web;
-    * exportación de informes a PDF, DOCX o CSV;
-    * comparación entre informes de diferentes periodos;
-    * incorporación de estadísticas adicionales;
-    * integración de las categorías y prioridades obtenidas mediante el componente NLP;
-    * configuración del proceso Scheduler en el entorno de despliegue para su ejecución completamente automática.
+Una futura versión podría incorporar:
 
-### Formulario de solicitud
+* Inicio de sesión.
+* Roles de usuario.
+* Permisos por organización.
+* Control de acceso a las diferentes operaciones de la API.
 
-- **Descarga de una copia de la solicitud**
+### Exportación de información
 
-    Como futura mejora, se podría incorporar la posibilidad de que el usuario descargue una copia de la solicitud una vez registrada, incluyendo sus datos principales y el código de referencia generado por FormsFlow.
+Podría incorporarse la exportación de los datos procesados a formatos como:
 
-    Esta funcionalidad permitiría al usuario conservar un justificante del registro y facilitaría la trazabilidad de la solicitud.
+* CSV.
+* Excel.
+* PDF.
 
-    La generación del documento podría implementarse, por ejemplo, mediante un PDF generado automáticamente a partir de los datos registrados.
+Esto permitiría ampliar las capacidades de explotación del dato.
 
-    Esta funcionalidad queda fuera del alcance de la versión actual para mantener el proyecto centrado en el flujo principal de registro, procesamiento, integración, automatización y explotación de datos.
+### NLP avanzado
 
-### Dashboard
-- Incorporar nuevos estados de gestión, como `in_progress`, `approved` o `rejected`.
+El clasificador actual basado en reglas podría evolucionar hacia técnicas más avanzadas como:
 
-- Añadir exportación de informes a PDF, DOCX o CSV.
+* Modelos supervisados.
+* Embeddings.
+* Clasificación mediante modelos de lenguaje.
+* Sistemas híbridos de reglas y modelos estadísticos.
 
-- Incorporar gráficos interactivos y filtros avanzados.
+La evolución requeriría disponer de un conjunto de datos etiquetado y definir métricas para evaluar el rendimiento del modelo.
 
-- Mostraremos la distribución de solicitudes agrupadas por organismo. Inicialmente podemos mostrarlo como una **lista con barras visuales**. No necesitamos todavía una librería de gráficos.
+### Dashboard avanzado
 
-**Historial avanzado de solicitudes**
+El Dashboard podría ampliarse con:
 
-    - Incorporación de filtros por rango de fechas, estado, categoría y prioridad para consultar el histórico completo de solicitudes.
+* Evolución temporal de solicitudes.
+* Gráficos por categoría.
+* Gráficos por prioridad.
+* Distribución por unidades.
+* Indicadores adicionales.
+* Filtros combinados.
 
-### NPL
-**Incorporación de un modelo supervisado de clasificación de texto o un sistema basado en embeddings**
+### Automatización avanzada
 
-- Para la primera versión utilizaremos un **clasificador basado en reglas y palabras clave ponderadas**. Como futura evolución se podría sustituir este clasificador por un modelo estadístico o de aprendizaje automático manteniendo la misma interfaz de entrada y salida. No incorporaremos inicialmente:
+El pipeline ETL puede integrarse con una planificación periódica mediante Laravel Scheduler y evolucionar hacia procesos de automatización más completos.
 
-    * modelos de lenguaje externos;
-    * APIs de terceros;
-    * modelos entrenados con grandes datasets;
-    * embeddings;
-    * infraestructura adicional;
-    * servicios cloud de IA.
+También podría incorporarse un sistema de notificaciones para determinadas solicitudes de alta prioridad.
 
 ---
 
 ## Documentación
 
-Incluye:
+La documentación del proyecto se encuentra principalmente en este README.
+
+Además, el código incorpora comentarios y documentación PHPDoc en las partes donde resulta útil para explicar responsabilidades y decisiones.
+
+La documentación se organiza alrededor de:
 
 * Arquitectura.
 * Modelo de datos.
 * API REST.
-* Procesos ETL.
-* Automatizaciones.
-* Componente NLP.
-* Decisiones técnicas.
+* Pipeline ETL.
+* Clasificación NLP.
+* Automatización.
 * Testing.
-* Despliegue.
+* Instalación.
+* Decisiones técnicas.
+* Mejoras futuras.
 
+El objetivo es que una persona técnica pueda comprender la arquitectura y ejecutar el proyecto sin depender de explicaciones externas.
 
 ---
 
 ## Enlaces
 
-**Repositorio:**
+### Repositorio
 
-[https://github.com/viorbe20/formsflow](https://github.com/viorbe20/formsflow)
+> Pendiente de añadir la URL definitiva del repositorio público de GitHub.
 
-**Demo pública:**
+### Demo
 
-*Pendiente de despliegue.*
+> Pendiente de añadir la URL de la demo pública.
+
+Una vez desplegada la aplicación, ambas direcciones se incorporarán a esta sección y podrán utilizarse directamente desde el CV.
 
 ---
 
-##  Licencia
+## Licencia
 
-Proyecto demostrador desarrollado con fines de portfolio y acreditación de competencias técnicas.
