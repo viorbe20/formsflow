@@ -85,4 +85,4 @@ EXPOSE 8000
 
 # Start the Laravel application.
 # Render will use this process to serve the public application.
-CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"]
+CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=${PORT:-10000}"]
