@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreApplicationRequest;
+use App\Jobs\ProcessApplicationRequestsJob;
 use App\Models\ApplicationRequest;
 use Illuminate\View\View;
 
@@ -24,6 +25,9 @@ class ApplicationRequestController extends Controller
 
         // Eloquent saves the application request in the database.
         $applicationRequest = ApplicationRequest::create($validated);
+
+        // Start the ETL process after receiving a new request.
+        ProcessApplicationRequestsJob::dispatch();
 
         return redirect()
             ->route('application-requests.create')
